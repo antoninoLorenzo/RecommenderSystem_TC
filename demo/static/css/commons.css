@@ -1,0 +1,48 @@
+:root {
+    --white: #FFFFFF;
+    --light-gray: #C3CAD2;
+    --dark-gray: #2C3238;
+    --black: #21262C;
+    --purple: #533DA1;
+    --orange: #FF785B;
+}
+
+@font-face {
+    font-family: 'Inter-Bold', sans-serif;
+    src: url("../font/Inter-Bold.ttf");
+    font-weight: 100;
+}
+
+.inter-bold {
+    font-family: 'Inter-Bold', sans-serif;
+}
+
+@font-face {
+    font-family: 'Inter-Regular', sans-serif;
+    src: url("../font/Inter-Regular.ttf");
+    font-weight: 100;
+}
+
+.inter-regular {
+    font-family: 'Inter-Regular', sans-serif;
+}
+
+@font-face {
+    font-family: 'Inter-Medium', sans-serif;
+    src: url("../font/Inter-Medium.ttf");
+    font-weight: 100;
+}
+
+.inter-medium {
+    font-family: 'Inter-Medium', sans-serif;
+}
+
+@font-face {
+    font-family: 'Inter-Light', sans-serif;
+    src: url("../font/Inter-Light.ttf");
+    font-weight: 100;
+}
+
+.inter-light {
+    font-family: 'Inter-Light', sans-serif;
+}
