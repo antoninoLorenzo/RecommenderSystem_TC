@@ -1,3 +1,12 @@
+import os
+import pprint
+import json
+import re
+import sqlite3
+
+import requests
+
+
 location_list = [
     'Padova,'
     'Veneto',
@@ -289,3 +298,82 @@ location_list = [
     'Wirral',
     'Peterborough'
 ]
+
+
+def autocomplete_location(query: str, key: str) -> tuple:
+    """
+    :param query: a string representing the location query
+    :param key: googlemaps places api key
+    :return: the first possible location as a tuple (City, Region, State)
+    """
+    pass
+
+
+def extract_locations(lli: list) -> list:
+    key = os.environ.get('PLACES_KEY')
+    if not key:
+        raise RuntimeError("PLACES_KEY Not Available: Please set Environment Variable PLACES_KEY")
+
+    locations = []
+    for loc in lli:
+        locations.append(autocomplete_location(loc, key))
+    return locations
+
+
+def extraction():
+    # -- Extract Locations
+    out = extract_locations(location_list)
+    locations_data = [
+        (1, 'City', 'Region', 'State')
+    ]
+
+    # -- Persist Locations
+    with sqlite3.connect('../datasets/locations_extracted.db') as conn:
+        curs = conn.cursor()
+
+        curs.execute('''
+            CREATE TABLE IF NOT EXISTS Locations (
+                ID INTEGER PRIMARY KEY,
+                City TEXT,
+                Region TEXT,
+                Country TEXT
+            )
+        ''')
+
+        curs.executemany('''
+            INSERT INTO Locations (ID, City, Region, Country) VALUES (?, ?, ?, ?)
+        ''', locations_data)
+
+        conn.commit()
+        conn.close()
+
+
+if __name__ == "__main__":
+    # extraction()
+    key = os.environ.get('PLACES_KEY')
+    if not key:
+        raise RuntimeError("PLACES_KEY Not Available: Please set Environment Variable PLACES_KEY")
+
+    link = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?'
+    language = 'it'
+    test_query = [
+        'Bologna, Emilia-Romagna',
+        '00165 Roma',
+        'London SE1'
+    ]
+
+    # -- remove caps
+
+    # -- query
+    """
+    for query in test_query:
+        try:
+            out = requests.get(link + 'input=' + query + '&key=' + key)
+            results = out.json()
+            print(f'Query: {query}; Length: {len(results["predictions"])}')
+            pprint.pprint(results["predictions"][1])
+
+            print(results["predictions"][1]["structured_formatting"]["secondary_text"])
+        except Exception as err:
+            print(err)
+    """
