@@ -365,7 +365,7 @@ if __name__ == "__main__":
     # -- remove caps
 
     # -- query
-    """
+
     for query in test_query:
         try:
             out = requests.get(link + 'input=' + query + '&key=' + key)
@@ -376,4 +376,3 @@ if __name__ == "__main__":
             print(results["predictions"][1]["structured_formatting"]["secondary_text"])
         except Exception as err:
             print(err)
-    """
