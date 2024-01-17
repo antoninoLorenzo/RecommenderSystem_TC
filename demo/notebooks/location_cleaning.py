@@ -6,6 +6,7 @@ AUTOCOMPLETE_API_LINK = 'https://maps.googleapis.com/maps/api/place/autocomplete
 DETAILS_API_LINK = 'https://maps.googleapis.com/maps/api/place/details/json?'
 
 
+# TODO: debug address component extraction
 def extract_locations(locations_list: list) -> dict:
     """
     Run extraction of full addresses for each location
