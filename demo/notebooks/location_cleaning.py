@@ -4,6 +4,8 @@ import requests
 
 AUTOCOMPLETE_API_LINK = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?'
 DETAILS_API_LINK = 'https://maps.googleapis.com/maps/api/place/details/json?'
+LANGUAGE = 'it'
+REMOVAL = ['Città metropolitana di ', 'Provincia di ']
 
 
 # TODO: debug address component extraction
@@ -24,27 +26,35 @@ def extract_locations(locations_list: list) -> dict:
     extracted_addresses = {}
     for query in locations_list:
         try:
+            autocomplete_request_link = f'{AUTOCOMPLETE_API_LINK}input={query}&key={key}&language={LANGUAGE}'
+            details_request_link = f'{DETAILS_API_LINK}input={query}&key={key}&language={LANGUAGE}'
+
             # Get Place ID
-            autocomplete_response = requests.get(AUTOCOMPLETE_API_LINK + 'input=' + query + '&key=' + key)
+            autocomplete_response = requests.get(autocomplete_request_link)
             autocomplete_parsed = autocomplete_response.json()
             place_id = autocomplete_parsed["predictions"][1]["place_id"]
 
             # Get Address Components
-            details_request = requests.get(DETAILS_API_LINK + 'place_id=' + place_id + '&key=' + key)
+            details_request = requests.get(details_request_link)
             details_parsed = details_request.json()
             address_components = details_parsed["result"]["address_components"]
 
             extracted_components = []
             for element in address_components:
                 if 'route' not in element['types'] and 'postal_code' not in element['types']:
-                    if 'Metropolitan City of ' in element['long_name']:
-                        new = element['long_name'][21:]
-                    else:
-                        new = element['long_name']
+                    # Clean component strings
+                    new = None
+                    for rem in REMOVAL:
+                        if rem in element['long_name']:
+                            new = element['long_name'][len(rem):]
+                            break
+                        else:
+                            new = element['long_name']
+                            break
 
+                    # Choose (city, region, state) components
                     if len(extracted_components) > 0:
                         for n in extracted_components:
-
                             if new not in n and n not in new:
                                 extracted_components.append(new)
                     else:
@@ -55,4 +65,22 @@ def extract_locations(locations_list: list) -> dict:
             print(err)
 
     return extracted_addresses
+
+
+if __name__ == "__main__":
+    import time
+    test = [
+        'Termoli, Molise',
+        '70100 Bari',
+        'Bolzano - Bozen, Trentino-Alto Adige',
+        'Basovizza, Friuli-Venezia Giulia',
+        '47122 Forlì'
+    ]
+
+    out = extract_locations(test)
+
+    start = time.time()
+    print(test)
+    end = time.time()
+    print(f'Done in: {end-start:.2f}')
 
