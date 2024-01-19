@@ -4,6 +4,7 @@
 **Dataset Offerte**
 - Descrizioni incomplete
 - Lingua richiesta non acquisita correttamente (sempre 'Italiano')
+- Debug della procedura di pulizia per le Location ([demo/notebooks/location_cleaning.py](https://github.com/antoninoLorenzo/RecommenderSystem_TC/blob/main/demo/notebooks/location_cleaning.py))
 
 **Dataset Skill**
 - Il dataset delle skill deve essere ampliato (Framework, ...)
