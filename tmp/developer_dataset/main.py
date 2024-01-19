@@ -3,11 +3,12 @@ Checklist:
 - [DONE] firstName
 - [DONE] lastName
 - [DONE] email
+- [] password
 - [] biography
-- [] professions
+- [] professions TODO
 - [WIP] skills TODO: improve skills and offer dataset
-- [] languages
-- [] location
+- [] languages TODO
+- [] location TODO
 """
 
 import sqlite3
