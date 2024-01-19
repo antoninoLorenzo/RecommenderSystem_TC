@@ -3,7 +3,7 @@ Checklist:
 - [DONE] firstName
 - [DONE] lastName
 - [DONE] email
-- [] password
+- [DONE] password
 - [] biography
 - [] professions TODO
 - [WIP] skills TODO: improve skills and offer dataset
@@ -13,6 +13,8 @@ Checklist:
 
 import sqlite3
 import random
+import re
+import exrex
 
 from faker import Faker
 from faker.providers import BaseProvider
@@ -20,17 +22,19 @@ from utils import create_table, insert_data
 
 # --- Setup resources
 
-DATASET_SIZE = 100
+DATASET_SIZE = 5000
 LANGUAGES = {'Italian': 'it_IT', 'English': 'en_US'}
 EMAIL_SUFFIX = ['@gmail.com', '@outlook.com', '@gmail.com', '@yahoo.com']
 REMOVAL_NAME = ['Sig.', 'Sig.ra', 'Dott.', 'Mr.', 'MD']
-SKILLS = set()
+
+SKILLS_TMP = set()
 with sqlite3.connect('./datasets/skills_dataset.db') as skills_conn:
     skills_curs = skills_conn.cursor()
-    skills_curs.execute('SELECT Skill FROM skills')
+    skills_curs.execute('SELECT SKILL FROM skills')
     rows = skills_curs.fetchall()
     for skill in rows:
-        SKILLS.add(skill[0])
+        SKILLS_TMP.add(skill[0])
+SKILLS = list(SKILLS_TMP)
 
 SKILL_SETS = []
 with sqlite3.connect('./datasets/skill_sets.db') as sk_sets_conn:
@@ -54,9 +58,9 @@ class SkillProvider(BaseProvider):
         :return: a set of skills
         """
         generated_skills = set()
-        for _ in range(1, random.randint(1, 5)):
+        for _ in range(1, random.randint(2, 5)):
             n = random.randint(0, len(SKILLS) - 1)
-            random_skill = list(SKILLS)[n]
+            random_skill = SKILLS[n]
 
             # get skill sets containing skill
             skills_subsets = []
@@ -74,6 +78,8 @@ class SkillProvider(BaseProvider):
                             for corresponding in SKILLS:
                                 if chosen_one == corresponding.lower():
                                     generated_skills.add(corresponding)
+                                    break
+                        break
 
             generated_skills.add(random_skill)
         return generated_skills
@@ -86,7 +92,7 @@ FAKE_SKILLS.add_provider(SkillProvider)
 
 # --- Generation Utils
 
-def generate_names() -> tuple:
+def generate_names(): #(tuple)
     """
     :return: (NAME, SURNAME)
     """
@@ -105,7 +111,9 @@ def generate_password() -> str:
     """
     TODO: add password
     :return:
+    regex "^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
     """
+    pass
 
 
 def generate_basic_info() -> dict:
@@ -144,11 +152,17 @@ def generate_basic_info() -> dict:
 
         mail.append(email_provider)
 
-        # Generate Password
-        yield {'name': name, 'surname': surname, 'email': "".join(mail)}
+        password = name + surname + "123_" #goofy ahh 
+        yield {'name': name, 'surname': surname, 'email': "".join(mail), "password": password}
 
 
 if __name__ == "__main__":
+
     for dev in generate_basic_info():
         fake_skills = FAKE_SKILLS.developer_skills()
-        print(f'Name: {dev["name"]} {dev["surname"]}\nEmail: {dev["email"]}\nSkills: {fake_skills}\n')
+        print(f'''
+        Name: {dev["name"]} {dev["surname"]}
+        Email: {dev["email"]}
+        Password: {dev["password"]}
+        Skills: {fake_skills}
+        ''')
