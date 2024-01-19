@@ -25,7 +25,7 @@ LANGUAGES = {'Italian': 'it_IT', 'English': 'en_US'}
 EMAIL_SUFFIX = ['@gmail.com', '@outlook.com', '@gmail.com', '@yahoo.com']
 REMOVAL_NAME = ['Sig.', 'Sig.ra', 'Dott.', 'Mr.', 'MD']
 SKILLS = set()
-with sqlite3.connect('./datasets/skills_short.db') as skills_conn:
+with sqlite3.connect('./datasets/skills_dataset.db') as skills_conn:
     skills_curs = skills_conn.cursor()
     skills_curs.execute('SELECT Skill FROM skills')
     rows = skills_curs.fetchall()
