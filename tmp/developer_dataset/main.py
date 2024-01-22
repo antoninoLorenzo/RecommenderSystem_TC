@@ -7,7 +7,7 @@ Checklist:
 - [] biography
 - [] professions TODO
 - [WIP] skills TODO: improve skills and offer dataset
-- [] languages TODO
+- [DONE] languages TODO
 - [] location TODO
 """
 
@@ -92,41 +92,49 @@ FAKE_SKILLS.add_provider(SkillProvider)
 
 # --- Generation Utils
 
-def generate_names(): #(tuple)
+def generate_names(): # -> tuple
     """
     :return: (NAME, SURNAME)
     """
+
+    locales = list(LANGUAGES.values())
+    
     for _ in range(0, DATASET_SIZE):
-        raw_name = FAKE.name().split()
+        locale = locales[random.randint(0, len(locales) - 1)]
+        raw_name = FAKE[locale].name().split()
         out_name = []
+        
+        for word in raw_name:
+            if word not in REMOVAL_NAME:
+                out_name.append(word)
+        
+        yield out_name[0], out_name[-1], locale
+        
 
-        for n in raw_name:
-            if n not in REMOVAL_NAME:
-                out_name.append(n)
 
-        yield out_name[0], out_name[1]
-
-
-def generate_password() -> str:
+def generate_password(): # -> str:
     """
     TODO: add password
     :return:
-    regex "^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+    regex r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
     """
     pass
 
 
-def generate_basic_info() -> dict:
+def generate_basic_info(): # -> dict:
     """
     TODO: add password
     :return: {'name': NAME, 'surname': SURNAME, 'email': EMAIL, 'password': PASSWORD}
     """
-    for name, surname in generate_names():
+    
+    languages = [(k, v) for k, v in LANGUAGES.items()]
+    for name, surname, locale in generate_names():
         mail = []
         email_provider = EMAIL_SUFFIX[random.randint(0, len(EMAIL_SUFFIX) - 1)]
         num = None
         lower_name = False
         lower_surname = False
+        spoken_languages = []
 
         if random.randint(0, 1) == 1:
             num = random.randint(1900, 2024)
@@ -153,7 +161,13 @@ def generate_basic_info() -> dict:
         mail.append(email_provider)
 
         password = name + surname + "123_" #goofy ahh 
-        yield {'name': name, 'surname': surname, 'email': "".join(mail), "password": password}
+        
+        if random.randint(0, len(languages)) == 0:
+            spoken_languages = [k for k, _ in languages]
+        else:
+            spoken_languages = [k for k, v in languages if v == locale]
+        
+        yield {'name': name, 'surname': surname, 'email': "".join(mail), "password": password, "locale" : locale, "spoken_languages": spoken_languages}
 
 
 if __name__ == "__main__":
@@ -165,4 +179,6 @@ if __name__ == "__main__":
         Email: {dev["email"]}
         Password: {dev["password"]}
         Skills: {fake_skills}
+        Locale: {dev["locale"]}
+        Spoken Languages {dev["spoken_languages"]}
         ''')
