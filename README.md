@@ -9,7 +9,8 @@
 
 **Data Understanding/Preparation**
 
-...
+- Migliorare procedure di estrazione (NLP)
+
 
 
 ### Fase 2
@@ -21,6 +22,7 @@
 **Realizzazione del Sistema**
 
 ...
+
 
 ### Fase 3
 **Integrazione del Modello col Sistema**
