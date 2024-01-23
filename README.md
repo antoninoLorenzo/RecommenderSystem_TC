@@ -2,7 +2,7 @@
 
 ## TODO
 **Dataset Offerte**
-- Dimensione attuale: 854; Dimensione Ideale: 1500
+- Dimensione attuale: 135(98); Dimensione minima: 500; Dimensione Desiderabile: 1000.
 - Debug della procedura di pulizia per le Location ([demo/notebooks/location_cleaning.py](https://github.com/antoninoLorenzo/RecommenderSystem_TC/blob/main/demo/notebooks/location_cleaning.py))
 
 **Dataset Developer**
