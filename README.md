@@ -1,12 +1,35 @@
 # RecommenderSystem_TC
 
 ## TODO
-**Dataset Offerte**
-- Dimensione attuale: 135(98); Dimensione minima: 500; Dimensione Desiderabile: 1000.
-- Debug della procedura di pulizia per le Location ([demo/notebooks/location_cleaning.py](https://github.com/antoninoLorenzo/RecommenderSystem_TC/blob/main/demo/notebooks/location_cleaning.py))
+### Fase 1
+**Data Extraction**
 
-**Dataset Developer**
-- ...
+- Scraping Dataset Offerte (Dimensione attuale: 168(125 valide); Dimensione minima: 500)
+- Generazione Dataset Developer
+
+**Data Understanding/Preparation**
+
+- Migliorare procedure di estrazione (NLP)
+
+
+
+### Fase 2
+**Realizzazione del Modello**
+
+...
+
+
+**Realizzazione del Sistema**
+
+...
+
+
+### Fase 3
+**Integrazione del Modello col Sistema**
+
+...
+
+
 
 ## Link Utili
 [indbscan](https://pypi.org/project/incdbscan/) : Implementazione dell'algoritmo DBSCAN Iterativo, permette l'aggiunta e la rimozione di Item dai Cluster generati.
