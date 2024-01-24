@@ -7,7 +7,7 @@ Checklist:
 - [] biography
 - [] professions TODO
 - [WIP] skills TODO: improve skills and offer dataset
-- [DONE] languages TODO
+- [DONE] languages
 - [] location TODO
 """
 
@@ -44,7 +44,13 @@ with sqlite3.connect('./datasets/skill_sets.db') as sk_sets_conn:
     for sk_set in rows:
         SKILL_SETS.append(sk_set[1].split(', '))
 
-
+PROFESSIONS = []
+with sqlite3.connect('./datasets/professions_dataset.db') as prof_conn:
+    prof_cursor = prof_conn.cursor()
+    prof_cursor.execute('SELECT Profession FROM Professions')
+    rows = prof_cursor.fetchall()
+    for profession in rows:
+        PROFESSIONS.append(profession[0])
 # --- Setup Faker
 
 class SkillProvider(BaseProvider):
@@ -61,6 +67,11 @@ class SkillProvider(BaseProvider):
         for _ in range(1, random.randint(2, 5)):
             n = random.randint(0, len(SKILLS) - 1)
             random_skill = SKILLS[n]
+
+            if random_skill.lower() == "html" and random.randint(0, 4) != 4:
+                generated_skills.add("CSS")
+            elif random_skill.lower() == "css" and random.randint(0, 4) != 4:
+                generated_skills.add("HTML")
 
             # get skill sets containing skill
             skills_subsets = []
@@ -134,7 +145,6 @@ def generate_basic_info(): # -> dict:
         num = None
         lower_name = False
         lower_surname = False
-        spoken_languages = []
 
         if random.randint(0, 1) == 1:
             num = random.randint(1900, 2024)
@@ -166,19 +176,23 @@ def generate_basic_info(): # -> dict:
             spoken_languages = [k for k, _ in languages]
         else:
             spoken_languages = [k for k, v in languages if v == locale]
-        
-        yield {'name': name, 'surname': surname, 'email': "".join(mail), "password": password, "locale" : locale, "spoken_languages": spoken_languages}
+
+        profession = PROFESSIONS[random.randint(0, len(PROFESSIONS) - 1)]
+
+        yield {'name': name, 'surname': surname, 'email': "".join(mail), "password": password, "profession" : profession, "locale" : locale, "spoken_languages": spoken_languages}
 
 
 if __name__ == "__main__":
 
     for dev in generate_basic_info():
         fake_skills = FAKE_SKILLS.developer_skills()
-        print(f'''
-        Name: {dev["name"]} {dev["surname"]}
-        Email: {dev["email"]}
-        Password: {dev["password"]}
-        Skills: {fake_skills}
-        Locale: {dev["locale"]}
-        Spoken Languages {dev["spoken_languages"]}
-        ''')
+        if "HTML" in fake_skills or "CSS" in fake_skills:
+            print(f'''
+            Name: {dev["name"]} {dev["surname"]}
+            Email: {dev["email"]}
+            Password: {dev["password"]}
+            Skills: {fake_skills}
+            Profession: {dev["profession"]}
+            Locale: {dev["locale"]}
+            Spoken Languages {dev["spoken_languages"]}
+            ''')
