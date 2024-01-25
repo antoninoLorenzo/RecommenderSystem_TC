@@ -7,3 +7,5 @@ exrex~=0.11.0
 Faker~=22.2.0
 nltk
 langdetect
+numpy
+folium
