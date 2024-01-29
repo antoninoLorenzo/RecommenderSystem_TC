@@ -192,7 +192,6 @@ def get_coordinates(location: str) -> dict:
     """
     Make a request to Google Places API to get Longitude and Latitude for a location string.
     """
-    print(f'get coordinates of {location}')
     response: Response = requests.get(PLACES_API.format(location), timeout=10)
     return response.json()['results'][0]['geometry']['location']
 
