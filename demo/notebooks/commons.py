@@ -2,12 +2,16 @@
 Collection of the functions used in analysis and modeling notebooks
 """
 from string import punctuation
+from functools import lru_cache
+from math import radians, cos, sin, asin, sqrt
 
+import requests
 import numpy as np
 import pandas as pd
 from pandas import Series
 from sklearn.cluster import KMeans
 from scipy.spatial.distance import euclidean
+from requests import Response
 
 
 # --- Modeling
@@ -176,3 +180,68 @@ def skill_to_id(skills: set[str], skills_frame) -> set[int]:
         )
 
     return out
+
+
+# --- Location Utils
+
+PLACES_API = '''https://maps.googleapis.com/maps/api/place/textsearch/json?query={}&key=AIzaSyBg32OrPVN2Qi1q6hJq16EagNSiwW4O6ys&language=it'''
+
+
+@lru_cache()
+def get_coordinates(location: str) -> dict:
+    """
+    Make a request to Google Places API to get Longitude and Latitude for a location string.
+    """
+    print(f'get coordinates of {location}')
+    response: Response = requests.get(PLACES_API.format(location), timeout=10)
+    return response.json()['results'][0]['geometry']['location']
+
+
+def haversine(lon1, lat1, lon2, lat2):
+    """
+    Prompt-Engineering basatissimo.
+    Calcola la distanza fra due posti utilizzando le coordinate e tenendo presente
+    cose che onestamente non mi sono molto chiare
+    """
+    # Convert decimal degrees to radians
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+    # Haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * asin(sqrt(a))
+    # Radius of earth in kilometers. Use 3956 for miles. Determines return value units.
+    r = 6371
+    return c * r
+
+
+def location_distance(frame: pd.DataFrame, off1_id, off2_id, location_column='Location') -> float:
+    """
+    Find distance between two locations in a dataframe.
+    """
+    loc1 = frame.loc[off1_id, location_column]
+    loc2 = frame.loc[off2_id, location_column]
+
+    lat1, lon1 = get_coordinates(loc1).values()
+    lat2, lon2 = get_coordinates(loc2).values()
+
+    return haversine(lon1, lat1, lon2, lat2)
+
+
+def get_near_offers(frame: pd.DataFrame, location: str, max_distance: float = 500):
+    """
+    Gets a location string as input and returns pandas Indexes used to filter a Dataframe:
+    1. calls get_coordinates to get latitude and longitude;
+    2. computes distance from query location and an offer;
+    3. sort distances and filter by max_distance.
+    """
+    user_lat, user_lon = get_coordinates(location).values()
+    distances: pd.Series = frame.apply(
+        lambda offer: haversine(
+            user_lon, user_lat,
+            offer['Longitude'], offer['Latitude']
+        )
+        , axis=1
+    ).rename('Distance').sort_values()
+    return list(distances[distances < max_distance].index)
