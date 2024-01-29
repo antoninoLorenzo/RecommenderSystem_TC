@@ -9,3 +9,4 @@ nltk
 langdetect
 numpy
 folium
+scipy
