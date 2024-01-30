@@ -47,6 +47,8 @@ def _item_cluster_distance(frame: pd.DataFrame, item: Series, target: int,
     Used to compute silhouette score.
     Computes distance between an item in a cluster X and the other items in a cluster Y.
     Used also when X and Y are the same clusters.
+    :param target: target cluster group label
+    :param group_label: frame column label for the cluster group label
     """
     group = frame[frame[group_label] == target]
     den = len(list(group.index))
@@ -55,7 +57,7 @@ def _item_cluster_distance(frame: pd.DataFrame, item: Series, target: int,
     for it in group.iterrows():
         if not it[1].equals(item):
             distance += _jaccard(item[distance_label], it[1][distance_label])
-
+    print(f'distance/den: {distance}/{den}')
     return distance / den
 
 
@@ -84,6 +86,7 @@ def kmeans_silhouette(frame: pd.DataFrame,
     ...
     """
     silhouette_scores = []
+    # basically for each cluster group (0, 1, 2, ...)
     for target_cluster in list(np.unique(frame[group_label])):
         nearest_cluster = _find_nearest_cluster(
             pd.DataFrame(clustering.cluster_centers_),
