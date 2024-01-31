@@ -186,20 +186,15 @@ def skill_to_id(skills: set[str], skills_frame) -> set[int]:
     """
     out = set()
     for skill in skills:
-        out.add(
-            list(
-                skills_frame.loc[
-                    skills_frame['SKILL'].apply(lambda val: val.lower()) == skill.lower()
-                    ].index
-            )[0]
-        )
+        tmp = list(skills_frame.loc[skills_frame['SKILL'].apply(lambda val: val.lower()) == skill.lower()].index)
+        out.add(tmp[0])
 
     return out
 
 
 # --- Location Utils
 
-PLACES_API = '''https://maps.googleapis.com/maps/api/place/textsearch/json?query={}&key=AIzaSyBg32OrPVN2Qi1q6hJq16EagNSiwW4O6ys&language=it'''
+PLACES_API = '''lemiepallequando'''
 
 
 @lru_cache()
