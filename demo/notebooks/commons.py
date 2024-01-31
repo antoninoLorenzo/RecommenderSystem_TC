@@ -57,7 +57,6 @@ def _item_cluster_distance(frame: pd.DataFrame, item: Series, target: int,
     for it in group.iterrows():
         if not it[1].equals(item):
             distance += _jaccard(item[distance_label], it[1][distance_label])
-    print(f'distance/den: {distance}/{den}')
     return distance / den
 
 
@@ -99,6 +98,19 @@ def kmeans_silhouette(frame: pd.DataFrame,
             silhouette_scores.append(silhouette_score)
 
     return np.mean(silhouette_scores)
+
+
+def _similar_offers_with_cluster(frame: pd.DataFrame, offer_id: int) -> list:
+    target_group = frame.loc[offer_id, 'Group']
+    return list(
+        frame[
+            frame['Group'] == target_group
+        ].index
+    )
+
+
+def similar_offers_with_cluster(frame: pd.DataFrame, offer_id: int) -> list:
+    return [frame.iloc[oid] for oid in _similar_offers_with_cluster(offer_id)]
 
 
 # --- Text parsing
