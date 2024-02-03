@@ -194,7 +194,7 @@ def skill_to_id(skills: set[str], skills_frame) -> set[int]:
 
 # --- Location Utils
 
-PLACES_API = '''lemiepallequando'''
+PLACES_API = '''https://maps.googleapis.com/maps/api/place/textsearch/json?query={}&key=AIzaSyBg32OrPVN2Qi1q6hJq16EagNSiwW4O6ys&language=it'''
 
 
 @lru_cache()
