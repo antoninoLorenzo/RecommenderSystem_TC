@@ -14,26 +14,8 @@ except ImportError as import_err:
     print(f'[!] {import_err}')
     sys.exit(1)
 
+from src import singleton
 from src.data import Item
-
-
-def singleton(cls):
-    """
-    Decorator for OfferModel and DeveloperModel, those should be initialized only once.
-    """
-    instances = {}
-
-    class SingletonWrapper(cls):
-        @staticmethod
-        def get_instance(*args, **kwargs):
-            """
-            Overwrite models get_instance method to implement Singleton
-            """
-            if cls not in instances:
-                instances[cls] = cls(*args, **kwargs)
-            return instances[cls]
-
-    return SingletonWrapper
 
 
 class Model(ABC):
