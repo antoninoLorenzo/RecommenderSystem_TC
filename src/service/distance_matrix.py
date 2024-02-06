@@ -1,4 +1,6 @@
-from abc import ABC, abstractmethod
+"""
+This module is for development, once done DistanceMatrix will go in model.py
+"""
 
 import numpy as np
 import pandas as pd
@@ -7,11 +9,15 @@ from src.data import Item
 
 
 class DistanceMatrix:
+    """
+    Distance Matrix computes distances between items in a dataset.
+    Internally uses Jaccard distance, so Items must contain a set feature.
+    """
 
     def __init__(self, frame: pd.DataFrame, column_label: str) -> None:
         """
-        :param frame:
-        :param column_label:
+        :param frame: dataset.
+        :param column_label: label of feature X of dataset represented as a set.
         """
         self.__distance_matrix = {}
 
@@ -34,14 +40,23 @@ class DistanceMatrix:
 
             self.__distance_matrix[item_id] = distances
 
-    def add_row(self, new_row: Item):
+    def add_item(self, new_item: Item):
+        """
+        Internally computes distances between new_item and stored items.
+        """
         pass
 
-    def delete_row(self, row: Item):
+    def delete_item(self, item: Item):
+        """
+        Removes stored item that must exist in the distance matrix.
+        """
         pass
 
     @property
     def matrix(self):
+        """
+        Access distance matrix distances as numpy ndarray
+        """
         return np.array(list(self.__distance_matrix.values()))
 
     @staticmethod
