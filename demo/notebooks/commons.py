@@ -173,9 +173,14 @@ def id_to_skill(skills: set[int], skills_frame) -> set[str]:
     """
     Converts skills in a set of skills from id to skill
     """
+    int_ids = {int(item) for item in skills}
+
     out = set()
-    for skill in skills:
-        out.add(skills_frame.loc[skill, 'SKILL'])
+    for skill in int_ids:
+        try:
+            out.add(skills_frame.loc[skill, 'SKILL'])
+        except KeyError:
+            pass
 
     return out
 
@@ -194,7 +199,7 @@ def skill_to_id(skills: set[str], skills_frame) -> set[int]:
 
 # --- Location Utils
 
-PLACES_API = '''https://maps.googleapis.com/maps/api/place/textsearch/json?query={}&key=AIzaSyBg32OrPVN2Qi1q6hJq16EagNSiwW4O6ys&language=it'''
+PLACES_API = 'lemiepalle'
 
 
 @lru_cache()
