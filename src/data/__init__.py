@@ -21,6 +21,7 @@ from src import singleton
 
 # --- Try build database connection link
 try:
+    """
     DB_LINK = 'mysql+pymysql://{}:{}@{}:{}/{}'.format(
         os.environ["DB_USR"],
         os.environ["DB_PSW"],
@@ -28,8 +29,9 @@ try:
         os.environ["DB_PORT"],
         os.environ["DB_CONN"]
     )
+    """
 except KeyError as env_not_found:
-    print(f'[!] {env_not_found}')
+    print(f'[!] Environment Variable Not Found : {env_not_found}')
     sys.exit(1)
 
 
