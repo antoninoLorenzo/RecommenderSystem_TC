@@ -147,7 +147,7 @@ class Offer(Item):
                  state: str,
                  description: str,
                  location_type: str,
-                 location):
+                 location: Location | None = None):
         self.__id: int = id
         self.__title: str = title
         self.__state: str = state

@@ -3,6 +3,7 @@ asd
 """
 
 import sys
+from pprint import pprint
 try:
     import uvicorn
     from fastapi import FastAPI, Request
@@ -10,7 +11,7 @@ except ImportError as import_err:
     print(f'[!] ImportError: {import_err}')
     sys.exit(1)
 
-from src.data.entity import Developer
+from src.data.entity import Developer, Offer, Location
 
 
 class SearchAPI:
@@ -31,7 +32,12 @@ class SearchAPI:
         @self.__app.post('/engine/v1/offers')
         async def search_offers(request: Request):
             content = await request.json()
-            return Developer.from_dict(content['user'])
+            # print(Developer.from_dict(content['user']))
+            pprint(content)
+            return [
+                Offer(1, 'Web Developer', 'active', 'desc', 'Remote'),
+                Offer(2, 'Frontend Developer', 'active', 'desc', 'Remote'),
+            ]
 
         @self.__app.post('/engine/v1/developers/search')
         def search_developers(query: str):
