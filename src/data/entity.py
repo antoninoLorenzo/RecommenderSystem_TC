@@ -5,7 +5,6 @@ import json
 
 from src.data import Item, not_none
 
-
 class Skill:
     """
     Skill POPO
@@ -63,6 +62,15 @@ class Location:
     def __str__(self):
         return f'[{self.__id}]: {self.__name} ({self.__lat}, {self.__lon})'
 
+
+class Language:
+    def __init__(self, lid, language_code):
+        self.__id = lid
+        self.__code = language_code
+
+    @property
+    def code(self):
+        return self.__code
 
 class Developer(Item):
     """
@@ -136,28 +144,40 @@ class Developer(Item):
         return self.__skills
 
 
+class Employer:
+    def __init__(self, dev_id, f_name, l_name, mail, psw, company_name):
+        self.__id: int = dev_id
+        self.__f_name: str = f_name
+        self.__l_name: str = l_name
+        self.__mail: str = mail
+        self.__psw: str = psw
+        self.__company = company_name
+
+
 class Offer(Item):
     """
     Offer POPO
     """
-    @not_none('id', 'title', 'state', 'description', 'location_type', 'employer_id', 'skills')
+    @not_none('id', 'title', 'state', 'description', 'location_type')
     def __init__(self,
                  id: int,
                  title: str,
                  state: str,
                  description: str,
-                 employer_id: int,
-                 skills: list[Skill],
+                 employer: Employer,
                  location_type: str,
-                 location: Location = None):
+                 location: Location | None = None,
+                 required_skills: list[Skill] | None = None,
+                 required_languages: list[Language] | None = None):
         self.__id: int = id
         self.__title: str = title
         self.__state: str = state
         self.__description: str = description
+        self.__employer = employer
         self.__location_type: str = location_type
         self.__location = location
-        self.__employer_id = employer_id
-        self.__skills = skills
+        self.__skills = required_skills
+        self.__languages = required_languages
 
     @property
     def id(self):

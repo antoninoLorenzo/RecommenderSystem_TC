@@ -11,7 +11,7 @@ except ImportError as import_err:
     print(f'[!] ImportError: {import_err}')
     sys.exit(1)
 
-from src.data.entity import Developer, Offer, Location
+from src.data.entity import Developer, Offer, Location, Skill, Language, Employer
 
 
 class SearchAPI:
@@ -33,10 +33,22 @@ class SearchAPI:
         async def search_offers(request: Request):
             content = await request.json()
             # print(Developer.from_dict(content['user']))
+            print('Developer: ')
             pprint(content)
+
             return [
-                Offer(1, 'Web Developer', 'active', 'desc', 'Remote'),
-                Offer(2, 'Frontend Developer', 'active', 'desc', 'Remote'),
+                Offer(1, 'Web Developer', 'active', 'desc',
+                      Employer(1, "Antonino", "Lorenzo", "anton@gmail.com", "1234", "asd"),
+                      'Remote',
+                      Location(1, "Avellino Italia", 123, 124),
+                      [Skill(1, "Python", "Programming Language")],
+                      [Language(1, "it")]),
+                Offer(2, 'Frontend Developer', 'active', 'desc',
+                      Employer(1, "Antonino", "Lorenzo", "anton@gmail.com", "1234", "asd"),
+                      'Remote',
+                      Location(1, "Avellino Italia", 123, 124),
+                      [Skill(1, "Python", "Programming Language")],
+                      [Language(1, "it")]),
             ]
 
         @self.__app.post('/engine/v1/developers/search')
