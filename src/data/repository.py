@@ -58,6 +58,9 @@ class DeveloperRepository:
 
     @not_none('developer_id')
     def get_developer(self, developer_id) -> Developer:
+        '''
+        Retrieves one developer based off of its id
+        '''
         df: DataFrame = read_sql_query(
             f'''
                     SELECT d.developerId, d.firstName, d.lastName, d.bio, d.mail, d.passwordAccount, d.locationId
@@ -136,6 +139,9 @@ class SkillRepository:
 
     @not_none('developer_id')
     def get_developer_skills(self, developer_id: int) -> list[Skill]:
+        '''
+        Retrieves the list of skills of a developer
+        '''
         df: DataFrame = read_sql_query(
             f'''
             SELECT s.skillId, s.skill_name, s.skill_type
