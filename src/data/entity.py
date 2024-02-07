@@ -140,20 +140,24 @@ class Offer(Item):
     """
     Offer POPO
     """
-    @not_none('id', 'title', 'state', 'description', 'location_type')
+    @not_none('id', 'title', 'state', 'description', 'location_type', 'employer_id', 'skills')
     def __init__(self,
                  id: int,
                  title: str,
                  state: str,
                  description: str,
+                 employer_id: int,
+                 skills: list[Skill],
                  location_type: str,
-                 location: Location | None = None):
+                 location: Location = None):
         self.__id: int = id
         self.__title: str = title
         self.__state: str = state
         self.__description: str = description
         self.__location_type: str = location_type
         self.__location = location
+        self.__employer_id = employer_id
+        self.__skills = skills
 
     @property
     def id(self):
@@ -178,3 +182,11 @@ class Offer(Item):
     @property
     def location(self):
         return self.__location
+
+    @property
+    def employer_id(self):
+        return self.__employer_id
+
+    @property
+    def skills(self):
+        return self.__skills

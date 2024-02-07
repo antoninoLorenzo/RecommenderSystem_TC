@@ -93,13 +93,14 @@ class LocationRepository:
     def __init__(self):
         self.__session: Session = DatabaseEngineFactory.get_instance().session
 
-    def get_location(self, location_id=None, developer_id=None) -> Location:
+    def get_location(self, location_id=None, developer_id=None, offer_id=None) -> Location:
         '''
         Retrieves one location based off of its ID or the ID of the developer who references it
-        location_id will be used if both are not None
+        location_id will be used if multiple are not none
+        developer_id will be used if it and offer_id are not none
         '''
-        if location_id is None and developer_id is None:
-            raise AttributeError('No attributes input')
+        if location_id is None and developer_id is None and offer_id is None:
+            raise AttributeError('All attributes are None, but at least one is needed')
 
         if location_id is not None:
             df = read_sql_query(
@@ -110,12 +111,21 @@ class LocationRepository:
                 ''',
                 self.__session.connection()
             )
-        else:
+        elif developer_id is not None:
             df = read_sql_query(
                 f'''
                 SELECT l.locationId, l.loc_name, l.lat, l.lon
                 FROM location l, developer d 
                 WHERE d.developerId = {developer_id} AND d.locationId = l.locationId
+                ''',
+                self.__session.connection()
+            )
+        else:
+            df = read_sql_query(
+                f'''
+                SELECT l.locationId, l.loc_name, l.lat, l.lon
+                FROM location l, offer o 
+                WHERE o.developerId = {offer_id} AND o.locationId = l.locationId
                 ''',
                 self.__session.connection()
             )
@@ -162,6 +172,88 @@ class SkillRepository:
             skills.append(skill)
 
         return skills
+
+    @not_none('offer_id')
+    def get_offer_skills(self, offer_id):
+        '''
+        Retrievs the list of skills of an offer
+        '''
+        df: DataFrame = read_sql_query(
+            f'''
+            SELECT s.skillId, s.skill_name, s.skill_type
+            FROM OfferSkill jt, skill s 
+            WHERE jt.offerId = {offer_id} AND jt.skillId = s.skillId
+            ''',
+            self.__session.connection()
+        )
+
+
+class OfferRepository:
+    def __init__(self):
+        self.__session: Session = DatabaseEngineFactory.get_instance().session
+
+    def get_all_offers(self) -> list[Offer]:
+        '''
+        Retrieves all offers and their locations
+        '''
+        df = read_sql_query(
+            f'''
+            SELECT *
+            FROM offer
+            '''
+        )
+
+        offers = []
+        locRepo = LocationRepository()
+        skillRepo = SkillRepository()
+        for _, row in df.iterrows():
+            offer = Offer(
+                row.offerId,
+                row.title,
+                row.state,
+                row.offerDescription,
+                row.employerId,
+                skillRepo.get_offer_skills(row.offerId),
+                row.locationType,
+                location=(None if row.locationType == 'Remote' else locRepo.get_location(offer_id=row.offerId))
+            )
+
+            offers.append(offer)
+
+        return offers
+
+    @not_none('offer_id')
+    def get_offer(self, offer_id) -> Offer:
+        '''
+        Retrieves one offer based off of its ID
+        '''
+
+        df = read_sql_query(
+            f'''
+            SELECT *
+            FROM offer o 
+            WHERE o.offerId = {offer_id}
+            ''',
+            self.__session.connection()
+        )
+
+        locRepo = LocationRepository()
+        skillRepo = SkillRepository()
+        for i, row in df.iterrows():
+            if i != 0:
+                raise Exception(f'fetch of single item returned multiple ({len(df)})')
+            offer = Offer(
+                row.offerId,
+                row.title,
+                row.state,
+                row.offerDescription,
+                row.employerId,
+                skillRepo.get_offer_skills(row.offerId),
+                row.locationType,
+                location=(None if row.locationType == 'Remote' else locRepo.get_location(offer_id=row.offerId))
+            )
+
+        return offer
 
 if __name__ == '__main__':
     dr = DeveloperRepository()
