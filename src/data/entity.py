@@ -69,8 +69,8 @@ class Developer(Item):
     Developer POPO
     """
 
-    @not_none('dev_id', 'f_name', 'l_name', 'mail', 'psw', 'location', 'skills')
-    def __init__(self, dev_id, f_name, l_name, mail, psw, location, skills):
+    @not_none('dev_id', 'f_name', 'l_name', 'bio', 'mail', 'psw', 'location', 'skills')
+    def __init__(self, dev_id, f_name, l_name, bio, mail, psw, location, skills):
         self.__id: int = dev_id
         self.__f_name: str = f_name
         self.__l_name: str = l_name

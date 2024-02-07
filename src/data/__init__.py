@@ -30,6 +30,7 @@ try:
         os.environ["DB_CONN"]
     )
     """
+    DB_LINK = 'mysql+pymysql://root:1234@localhost:3306/turing_careers'
 except KeyError as env_not_found:
     print(f'[!] Environment Variable Not Found : {env_not_found}')
     sys.exit(1)
