@@ -1,6 +1,8 @@
 """
 Contains database Entities
 """
+import json
+
 from src.data import Item, not_none
 
 
@@ -58,21 +60,52 @@ class Location:
     def longitude(self):
         return self.__lon
 
+    def __str__(self):
+        return f'[{self.__id}]: {self.__name} ({self.__lat}, {self.__lon})'
+
 
 class Developer(Item):
     """
     Developer POPO
     """
 
-    @not_none('dev_id', 'f_name', 'l_name', 'mail', 'psw', 'location')
-    def __init__(self, dev_id, f_name, l_name, mail, psw, location):
+    @not_none('dev_id', 'f_name', 'l_name', 'mail', 'psw', 'location', 'skills')
+    def __init__(self, dev_id, f_name, l_name, mail, psw, location, skills):
         self.__id: int = dev_id
         self.__f_name: str = f_name
         self.__l_name: str = l_name
         self.__mail: str = mail
         self.__psw: str = psw
         self.__location: Location = location
-        self.__skills: list = []
+        self.__skills: list = skills
+
+    @staticmethod
+    def from_dict(data: dict) -> 'Developer':
+        """
+        Creates a Developer instance from a JSON string.
+        """
+
+        dev_id = data['dev_id']
+        f_name = data['f_name']
+        l_name = data['l_name']
+        mail = data['mail']
+        psw = data['psw']
+        location_data = data['location']
+        skills = data['skills']
+
+        location = Location(
+            location_data['loc_id'],
+            location_data['loc_name'],
+            location_data['lat'],
+            location_data['lon']
+        )
+
+        return Developer(dev_id, f_name, l_name, mail, psw, location, skills)
+
+    def __str__(self):
+        return (f'[{self.__id}]: {self.__f_name} {self.__l_name} ({self.__mail}: {self.__psw})\n'
+                f'Skills: {self.__skills}\n'
+                f'Location: {self.__location}')
 
     @property
     def developer_id(self):

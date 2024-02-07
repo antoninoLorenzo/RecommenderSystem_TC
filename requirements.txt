@@ -11,3 +11,6 @@ numpy~=1.26.0
 folium
 scipy~=1.11.2
 SQLAlchemy~=2.0.23
+fastapi~=0.104.1
+uvicorn~=0.24.0.post1
+pydantic~=2.5.1
