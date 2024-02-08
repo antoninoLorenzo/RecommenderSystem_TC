@@ -145,8 +145,8 @@ class Developer(Item):
 
 
 class Employer:
-    def __init__(self, dev_id, f_name, l_name, mail, psw, company_name):
-        self.__id: int = dev_id
+    def __init__(self, emp_id, f_name, l_name, mail, psw, company_name):
+        self.__id: int = emp_id
         self.__f_name: str = f_name
         self.__l_name: str = l_name
         self.__mail: str = mail

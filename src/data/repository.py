@@ -206,13 +206,14 @@ class OfferRepository:
         offers = []
         locRepo = LocationRepository()
         skillRepo = SkillRepository()
+        emplRepo = EmployerRepository()
         for _, row in df.iterrows():
             offer = Offer(
                 row.offerId,
                 row.title,
                 row.state,
                 row.offerDescription,
-                row.employerId,
+                emplRepo.get_employer(row.employerId),
                 skillRepo.get_offer_skills(row.offerId),
                 row.locationType,
                 location=(None if row.locationType == 'Remote' else locRepo.get_location(offer_id=row.offerId))
@@ -239,6 +240,7 @@ class OfferRepository:
 
         locRepo = LocationRepository()
         skillRepo = SkillRepository()
+        emplRepo = EmployerRepository()
         for i, row in df.iterrows():
             if i != 0:
                 raise Exception(f'fetch of single item returned multiple ({len(df)})')
@@ -247,13 +249,48 @@ class OfferRepository:
                 row.title,
                 row.state,
                 row.offerDescription,
-                row.employerId,
+                emplRepo.get_employer(row.employerId),
                 skillRepo.get_offer_skills(row.offerId),
                 row.locationType,
                 location=(None if row.locationType == 'Remote' else locRepo.get_location(offer_id=row.offerId))
             )
 
         return offer
+
+
+class EmployerRepository:
+    def __init__(self):
+        self.__session: Session = DatabaseEngineFactory.get_instance().session
+
+
+    def get_employer(self, employer_id) -> Employer:
+        '''
+        Retrieves an employer based off of its id
+        '''
+
+        df = read_sql_query(
+            f'''
+            SELECT *
+            FROM employer e 
+            WHERE e.employerId = {employer_id}
+            '''
+        )
+
+        for i, row in df.iterrows():
+            if i != 0:
+                raise Exception(f'fetch of single item returned multiple ({len(df)})')
+
+            employer = Employer(
+                row.employrId,
+                row.firstName,
+                row.lastName,
+                row.mail,
+                row.passwordAccount,
+                row.companyName
+            )
+
+
+        return employer
 
 if __name__ == '__main__':
     dr = DeveloperRepository()
