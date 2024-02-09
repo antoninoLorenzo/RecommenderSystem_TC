@@ -25,17 +25,28 @@ class DeveloperRepository:
     def __init__(self):
         self.__session: Session = DatabaseEngineFactory.get_instance().session
 
-    def get_all_developers(self) -> list[Developer]:
+    def get_developers(self, query=None) -> list[Developer]:
         """
         Make a query to the database using pandas
         """
-        result: DataFrame = read_sql_query(
-            f'''
-            SELECT d.developerId, d.firstName, d.lastName, d.bio, d.mail, d.passwordAccount, d.locationId
-            from developer d
-            ''',
-            self.__session.connection()
-        )
+        if query is None:
+            result: DataFrame = read_sql_query(
+                f'''
+                SELECT d.developerId, d.firstName, d.lastName, d.bio, d.mail, d.passwordAccount, d.locationId
+                from developer d
+                ''',
+                self.__session.connection()
+            )
+        else:
+            result: DataFrame = read_sql_query(
+                f'''
+                SELECT *
+                FROM developer d 
+                WHERE MATCH(d.bio)
+                AGAINST('{query}' IN NATURAL LANGUAGE MODE)
+                ''',
+                self.__session.connection()
+            )
 
         devs = []
         locRepo = LocationRepository()
@@ -174,7 +185,7 @@ class SkillRepository:
         return skills
 
     @not_none('offer_id')
-    def get_offer_skills(self, offer_id):
+    def get_offer_skills(self, offer_id: int) -> list[Skill]:
         '''
         Retrievs the list of skills of an offer
         '''
@@ -187,21 +198,44 @@ class SkillRepository:
             self.__session.connection()
         )
 
+        skills = []
+        for _, row in df.iterrows():
+            skill = Skill(
+                row.skillId,
+                row.skill_name,
+                row.skill_type
+            )
+
+            skills.append(skill)
+
+        return skills
+
 
 class OfferRepository:
     def __init__(self):
         self.__session: Session = DatabaseEngineFactory.get_instance().session
 
-    def get_all_offers(self) -> list[Offer]:
+    def get_offers(self, query=None) -> list[Offer]:
         '''
         Retrieves all offers and their locations
         '''
-        df = read_sql_query(
-            f'''
-            SELECT *
-            FROM offer
-            '''
-        )
+        if query is None:
+            df = read_sql_query(
+                f'''
+                SELECT *
+                FROM offer
+                '''
+            )
+        else:
+            df = read_sql_query(
+                f'''
+                SELECT *
+                FROM offer o 
+                WHERE MATCH(o.title, o.offerDescription)
+                AGAINST('{query}' IN NATURAL LANGUAGE MODE)
+                ''',
+                self.__session.connection()
+            )
 
         offers = []
         locRepo = LocationRepository()
@@ -295,5 +329,5 @@ class EmployerRepository:
 if __name__ == '__main__':
     dr = DeveloperRepository()
 
-    for s in dr.get_developer(1).skills:
-        print(s.name)
+    for s in dr.get_developers('bio'):
+        print(s.first_name)

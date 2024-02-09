@@ -1,6 +1,8 @@
 """
 Contains database Entities
 """
+from __future__ import annotations
+
 import json
 
 from src.data import Item, not_none
