@@ -155,7 +155,7 @@ if __name__ == "__main__":
                     for dev_loc in devs_locations:
                         if (not dev_loc['tbd']) and (dev_loc['lon'] == location['lon']) and (dev_loc['lat'] == location['lat']):
                             dev_loc['tbd'] = True
-                            to_delete.add(dev_loc['id'])
+                            to_delete.add(dev_loc['loc_id'])
                             devs[dev_loc['dev_id'] - 1]['loc_id'] = location['offer_id']
 
             for i, loc in enumerate(devs_locations):
@@ -169,11 +169,6 @@ if __name__ == "__main__":
 
             for id in to_delete:
                 devs_locations.remove([l for l in devs_locations if l['loc_id'] == id][0])
-
-
-
-
-
 
     script = open('db_populator.sql', 'w')
     script.write('USE turing_careers;\n')
