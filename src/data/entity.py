@@ -7,10 +7,12 @@ import json
 
 from src.data import Item, not_none
 
+
 class Skill:
     """
     Skill POPO
     """
+
     @not_none('id', 'name', 'type')
     def __init__(self,
                  id: int,
@@ -74,18 +76,21 @@ class Language:
     def code(self):
         return self.__code
 
+
 class Developer(Item):
     """
     Developer POPO
     """
 
-    @not_none('dev_id', 'f_name', 'l_name', 'bio', 'mail', 'psw', 'location', 'skills')
-    def __init__(self, dev_id, f_name, l_name, bio, mail, psw, location, skills):
+    @not_none('dev_id', 'f_name', 'l_name', 'bio', 'mail', 'psw', 'language', 'location', 'skills')
+    def __init__(self, dev_id, f_name, l_name, bio, mail, psw, languages, location, skills):
         self.__id: int = dev_id
         self.__f_name: str = f_name
         self.__l_name: str = l_name
+        self.__bio: str = bio
         self.__mail: str = mail
         self.__psw: str = psw
+        self.__languages: list[Language] = languages
         self.__location: Location = location
         self.__skills: list = skills
 
@@ -98,9 +103,11 @@ class Developer(Item):
         dev_id = data['dev_id']
         f_name = data['f_name']
         l_name = data['l_name']
+        bio = data['bio']
         mail = data['mail']
         psw = data['psw']
         location_data = data['location']
+
         skills = data['skills']
 
         location = Location(
@@ -110,12 +117,16 @@ class Developer(Item):
             location_data['lon']
         )
 
-        return Developer(dev_id, f_name, l_name, mail, psw, location, skills)
+        language = []
+
+        return Developer(dev_id, f_name, l_name, bio, mail, psw, language, location, skills)
 
     def __str__(self):
         return (f'[{self.__id}]: {self.__f_name} {self.__l_name} ({self.__mail}: {self.__psw})\n'
+                f'Language: {self.__languages}\n'
                 f'Skills: {self.__skills}\n'
-                f'Location: {self.__location}')
+                f'Location: {self.__location}\n'
+                f'Bio: \n{self.__bio}\n')
 
     @property
     def developer_id(self):
@@ -160,6 +171,7 @@ class Offer(Item):
     """
     Offer POPO
     """
+
     @not_none('id', 'title', 'state', 'description', 'location_type')
     def __init__(self,
                  id: int,
