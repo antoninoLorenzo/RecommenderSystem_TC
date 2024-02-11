@@ -31,9 +31,11 @@ class DeveloperRepository:
         """
         if query is None:
             result: DataFrame = read_sql_query(
-                f'''
-                SELECT d.developerId, d.firstName, d.lastName, d.bio, d.mail, d.passwordAccount, d.locationId
-                from developer d
+                '''
+                SELECT *
+                FROM developer d
+                JOIN developerlanguage dl ON d.developerId = dl.developerId
+                JOIN Language l ON dl.languageId = l.languageId
                 ''',
                 self.__session.connection()
             )
@@ -49,18 +51,23 @@ class DeveloperRepository:
             )
 
         devs = []
-        locRepo = LocationRepository()
-        skillRepo = SkillRepository()
+        loc_repo = LocationRepository()
+        skill_repo = SkillRepository()
         for _, row in result.iterrows():
+            dev_lang = Language(row.languageId, row.languageCode)
+            dev_loc = loc_repo.get_location(location_id=row.locationId)
+            dev_skills = skill_repo.get_developer_skills(row.developerId.iloc[0])
+
             dev = Developer(
-                row.developerId,
-                row.firstName,
-                row.lastName,
-                row.bio,
-                row.mail,
-                row.passwordAccount,
-                locRepo.get_location(location_id=row.locationId),
-                skillRepo.get_developer_skills(row.developerId)
+                dev_id=row.developerId,
+                f_name=row.firstName,
+                l_name=row.lastName,
+                bio=row.bio,
+                mail=row.mail,
+                psw=row.passwordAccount,
+                languages=[dev_lang],
+                location=dev_loc,
+                skills=dev_skills
             )
 
             devs.append(dev)
@@ -136,7 +143,7 @@ class LocationRepository:
                 f'''
                 SELECT l.locationId, l.loc_name, l.lat, l.lon
                 FROM location l, offer o 
-                WHERE o.developerId = {offer_id} AND o.locationId = l.locationId
+                WHERE o.offerId = {offer_id} AND o.locationId = l.locationId
                 ''',
                 self.__session.connection()
             )
@@ -224,7 +231,8 @@ class OfferRepository:
                 f'''
                 SELECT *
                 FROM offer
-                '''
+                ''',
+                self.__session.connection()
             )
         else:
             df = read_sql_query(
@@ -242,15 +250,20 @@ class OfferRepository:
         skillRepo = SkillRepository()
         emplRepo = EmployerRepository()
         for _, row in df.iterrows():
+            if row.locationType == 'Remote':
+                _location = None
+            else:
+                _location = locRepo.get_location(offer_id=row.offerId)
+
             offer = Offer(
-                row.offerId,
-                row.title,
-                row.state,
-                row.offerDescription,
-                emplRepo.get_employer(row.employerId),
-                skillRepo.get_offer_skills(row.offerId),
-                row.locationType,
-                location=(None if row.locationType == 'Remote' else locRepo.get_location(offer_id=row.offerId))
+                id=row.offerId,
+                title=row.title,
+                state=row.state,
+                description=row.offerDescription,
+                employer=emplRepo.get_employer(row.employerId),
+                required_skills=skillRepo.get_offer_skills(row.offerId),
+                location_type=row.locationType,
+                location=_location
             )
 
             offers.append(offer)
@@ -307,7 +320,8 @@ class EmployerRepository:
             SELECT *
             FROM employer e 
             WHERE e.employerId = {employer_id}
-            '''
+            ''',
+            self.__session.connection()
         )
 
         for i, row in df.iterrows():
@@ -315,7 +329,7 @@ class EmployerRepository:
                 raise Exception(f'fetch of single item returned multiple ({len(df)})')
 
             employer = Employer(
-                row.employrId,
+                row.employerId,
                 row.firstName,
                 row.lastName,
                 row.mail,

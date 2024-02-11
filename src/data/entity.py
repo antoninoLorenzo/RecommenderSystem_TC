@@ -82,7 +82,7 @@ class Developer(Item):
     Developer POPO
     """
 
-    @not_none('dev_id', 'f_name', 'l_name', 'bio', 'mail', 'psw', 'language', 'location', 'skills')
+    @not_none('dev_id', 'f_name', 'l_name', 'bio', 'mail', 'psw', 'languages', 'location', 'skills')
     def __init__(self, dev_id, f_name, l_name, bio, mail, psw, languages, location, skills):
         self.__id: int = dev_id
         self.__f_name: str = f_name
@@ -224,3 +224,12 @@ class Offer(Item):
     @property
     def skills(self):
         return self.__skills
+
+    def __str__(self):
+        return (f'[{self.__id}]: {self.__title} ({self.__state})\n'
+                f'Employer: \n{self.__employer}\n'
+                f'Location: {self.__location_type}, {(self.__location or None)}\n'
+                f'RequiredSkills: \n{self.__skills}\n'
+                f'Languages: \n{self.__languages}\n'
+                f'Description:\n{self.__description}\n')
+
