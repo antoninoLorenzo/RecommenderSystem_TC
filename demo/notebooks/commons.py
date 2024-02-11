@@ -57,7 +57,14 @@ def _item_cluster_distance(frame: pd.DataFrame, item: Series, target: int,
     for it in group.iterrows():
         if not it[1].equals(item):
             distance += _jaccard(item[distance_label], it[1][distance_label])
-    return distance / den
+    if distance == 0:
+        distance = 1
+    if den == 0:
+        den = 1
+    try:
+        return distance / den
+    except ZeroDivisionError:
+        return 0
 
 
 def _find_nearest_cluster(centroids, target_label: int):
