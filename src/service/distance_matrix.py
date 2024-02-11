@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 
 from src.data import Item
+from src.data.entity import Offer, Developer
+from src.data.repository import OfferRepository, DeveloperRepository
 
 
 class DistanceMatrix:
@@ -67,22 +69,37 @@ class DistanceMatrix:
         return 1 - (len(s1.intersection(s2)) / len(s1.union(s2)))
 
 
+def get_offers_frame(offer_list: list[Offer]):
+    offers_dict = []
+    for o in offer_list:
+        skill_set = {s.name for s in o.skills}
+        offers_dict.append({
+            'id': o.id,
+            'Title': o.title,
+            'RequiredSkills': skill_set
+        })
+    return pd.DataFrame(offers_dict)
+
+
+def get_developers_frame(developer_list: list[Developer]):
+    developers_dict = []
+    for d in developer_list:
+        skills_set = {s.name for s in d.skills}
+        developers_dict.append({
+            'id': d.developer_id,
+            'Skills': skills_set
+        })
+    return pd.DataFrame(developers_dict)
+
+
 if __name__ == "__main__":
     # --- Get Offers Dataframe
-    import sqlite3
-
-    with sqlite3.connect('../../demo/datasets/offers_full.db') as offers_conn:
-        offers_frame = pd.read_sql_query('SELECT * FROM offers', offers_conn)
-
-
-    def string_to_set(item_set):
-        return set(item_set.split(', '))
-
-
-    offers_frame['RequiredSkills'] = offers_frame['RequiredSkills'].apply(string_to_set)
-
-    # Core
-    distance_matrix = DistanceMatrix(offers_frame, 'RequiredSkills')
+    developers: list[Developer] = DeveloperRepository().get_developers()
+    distance_matrix = DistanceMatrix(
+        get_developers_frame(developers),
+        'Skills'
+    )
+    print(get_developers_frame(developers).iloc[1])
 
     # --- Test with Birch
     from sklearn.cluster import Birch

@@ -16,6 +16,9 @@ except ImportError as import_err:
 
 from src import singleton
 from src.data import Item
+from src.data.entity import Developer, Offer, Skill, Language, Location
+from src.data.repository import DeveloperRepository, OfferRepository, SkillRepository
+from src.service.distance_matrix import DistanceMatrix, get_offers_frame, get_developers_frame
 
 
 class Model(ABC):
@@ -77,14 +80,29 @@ class OfferModel(Model):
     Contains a Similarity Based model to recommend Offers to Developers.
     """
 
-    def __init__(self, value):
-        self.a = value
-        # --- load offers in dataframe
-        # self.__offers = DataFrame()
+    def __init__(self):
+        try:
+            print('---- Initializing OfferModel')
+            self.__offers = OfferRepository().get_offers()
+            self.__frame = get_offers_frame(self.__offers)
 
-        # --- model first train
-        # self.__model = Birch()
-        # self.__reducer = PCA(2)
+            print('---- Building DistanceMatrix')
+            self.__matrix = DistanceMatrix(
+                self.__frame,
+                'RequiredSkills'
+            )
+
+            print('---- Training BIRCH')
+            self.__model = Birch(branching_factor=50, n_clusters=3, threshold=0.7)
+            self.__reducer = PCA(2)
+            self.__reduced_matrix = self.__reducer.fit_transform(self.__matrix.matrix)
+            self.__model.fit(self.__reduced_matrix)
+            self.__group_labels = self.__model.labels_
+            self.__frame['Group'] = self.__group_labels
+        except Exception as err:
+            print(f'---- Error initializing OfferModel\n{err}')
+            sys.exit(1)
+        print('---- Offer model successfully initialized')
 
     def get_instance(*args, **kwargs):
         """
@@ -93,16 +111,24 @@ class OfferModel(Model):
         raise NotImplementedError()
 
     def similar_items(self, item: Item) -> list[Item]:
-        raise NotImplementedError()
+        if not isinstance(item, Developer):
+            raise ValueError("[OfferModel] similar_items expects a Developer")
+
+        skill_set = {s.name for s in item.skills}
+        print(skill_set)
+        return []
 
     def add_item(self, item: Item):
-        raise NotImplementedError()
+        if not isinstance(item, Offer):
+            raise ValueError("[OfferModel] add_item expects an offer")
 
     def update_item(self, item: Item):
-        raise NotImplementedError()
+        if not isinstance(item, Offer):
+            raise ValueError("[OfferModel] update_item expects an offer")
 
     def remove_item(self, item: Item):
-        raise NotImplementedError()
+        if not isinstance(item, Offer):
+            raise ValueError("[OfferModel] remove_item expects an offer")
 
 
 @singleton
@@ -112,12 +138,28 @@ class DeveloperModel(Model):
     """
 
     def __init__(self):
-        # --- load developers in dataframe
-        self.__developers = DataFrame()
+        try:
+            print('---- Initializing DeveloperModel')
+            self.__developers = DeveloperRepository().get_developers()
+            self.__frame = get_developers_frame(self.__developers)
 
-        # --- model first train
-        self.__model = Birch()
-        self.__reducer = PCA(2)
+            print('---- Building DistanceMatrix')
+            self.__matrix = DistanceMatrix(
+                self.__frame,
+                'Skills'
+            )
+
+            print('---- Training BIRCH')
+            self.__model = Birch(branching_factor=50, n_clusters=3, threshold=0.5)
+            self.__reducer = PCA(2)
+            self.__reduced_matrix = self.__reducer.fit_transform(self.__matrix.matrix)
+            self.__model.fit(self.__reduced_matrix)
+            self.__group_labels = self.__model.labels_
+            self.__frame['Group'] = self.__group_labels
+        except Exception as err:
+            print(f'---- Error initializing DeveloperModel\n{err}')
+            sys.exit(1)
+        print('---- Developer model successfully initialized')
 
     def get_instance(*args, **kwargs):
         """
@@ -140,15 +182,15 @@ class DeveloperModel(Model):
 
 # --- Development Only
 
-def is_singleton():
-    """."""
-    offer_model = ModelManager.get_offers_model(2)
-    print(f'first instance a: {offer_model.a}')
-    offer_model.a = 4
-    print(f'first instance a: {offer_model.a}')
-    new_instance = ModelManager.get_offers_model()
-    print(f'other instance a: {new_instance.a}')
-
-
 if __name__ == "__main__":
-    is_singleton()
+    stub_developer = Developer(1, 'Antonino', 'Lorenzo', 'bio',
+                               'anton@asd.com', 'DioCiao0003', [Language(1, 'it')],
+                               Location(1, 'Avellino', 83.0, 100.0),
+                               [Skill(1, 'Java', 'Programming Language')]
+                               )
+
+    offer_model: OfferModel = OfferModel()
+
+    offer_model.similar_items(stub_developer)
+
+    developer_model: DeveloperModel = DeveloperModel()
