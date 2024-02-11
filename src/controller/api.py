@@ -40,6 +40,7 @@ class SearchAPI:
         @self.__app.post('/engine/v1/developers')
         async def recommend_developers(request: Request):
             RecommenderEngine().recommend_developer(stub_offer)
+            return [stub_developer, stub_developer]
 
         @self.__app.post('/engine/v1/add')
         async def add(request: Request):
