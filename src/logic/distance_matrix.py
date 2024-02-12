@@ -1,6 +1,7 @@
 """
 This module is for development, once done DistanceMatrix will go in model.py
 """
+import sys
 
 import numpy as np
 import pandas as pd
@@ -8,6 +9,20 @@ import pandas as pd
 from src.data import Item
 from src.data.entity import Offer, Developer
 from src.data.repository import OfferRepository, DeveloperRepository
+
+
+class ItemDistance:
+    def __init__(self, item_id, item_distance):
+        self.__item_id = item_id
+        self.__item_distance = item_distance
+
+    @property
+    def item_id(self):
+        return self.__item_id
+
+    @property
+    def item_distance(self):
+        return self.__item_distance
 
 
 class DistanceMatrix:
@@ -22,8 +37,10 @@ class DistanceMatrix:
         :param column_label: label of feature X of dataset represented as a set.
         """
         self.__distance_matrix = {}
-
+        self.__size = len(frame)
         frame_data = frame[column_label].to_dict()
+        self.__frame_data = frame_data
+
         for item_id, item_data in frame_data.items():
             if not isinstance(item_data, set):
                 raise ValueError('[!] DistanceMatrix: specified column of frame should contains sets')
@@ -31,35 +48,80 @@ class DistanceMatrix:
             distances = []
             for other_item_id, other_item_data in frame_data.items():
                 if item_id != other_item_id:
-                    distances.append(
-                        self.jaccard(
-                            item_data,
-                            other_item_data
-                        )
-                    )
+                    distances.append(ItemDistance(other_item_id, self.jaccard(item_data,other_item_data)))
+                    # distances.append(self.jaccard(item_data, other_item_data))
                 else:
-                    distances.append(0)
+                    # distances.append((item_id, 0))
+                    distances.append(ItemDistance(item_id, 0))
 
             self.__distance_matrix[item_id] = distances
+
+    def get_item(self, item_id):
+        for key, value in self.__frame_data.items():
+            if key == item_id:
+                return value
+        return None
 
     def add_item(self, new_item: Item):
         """
         Internally computes distances between new_item and stored items.
         """
-        pass
+        if isinstance(new_item, Developer):
+            item: Developer = new_item
+        elif isinstance(new_item, Offer):
+            item: Offer = new_item
+        else:
+            raise ValueError('[!] DistanceMatrix: add_item requires Offer or Developer')
 
-    def delete_item(self, item: Item):
+        distances = []
+        skills = set([skill.name for skill in item.skills])
+        for item_id, item_data in self.__frame_data.items():
+            d = self.jaccard(item_data, skills)
+            distance = ItemDistance(item_id, d)
+            distance_col = ItemDistance(item.id, d)
+            distances.append(distance)
+            self.__distance_matrix[item_id].append(distance_col)
+
+        distances.append(ItemDistance(item.id, 0))
+        self.__distance_matrix[item.id] = distances
+        self.__frame_data[item.id] = skills
+        self.__size += 1
+
+    def delete_item(self, to_delete: Item):
         """
         Removes stored item that must exist in the distance matrix.
         """
-        pass
+        if isinstance(to_delete, Developer):
+            item: Developer = to_delete
+        elif isinstance(to_delete, Offer):
+            item: Offer = to_delete
+        else:
+            raise ValueError('[!] DistanceMatrix: add_item requires Offer or Developer')
+
+        for key, value in self.__distance_matrix.items():
+            if key != 1000:
+                for distance in value:
+                    if item.id == distance.item_id:
+                        value.remove(distance)
+
+        self.__distance_matrix.pop(item.id)
+        self.__frame_data.pop(item.id)
+        self.__size -= 1
 
     @property
     def matrix(self):
         """
         Access distance matrix distances as numpy ndarray
         """
-        return np.array(list(self.__distance_matrix.values()))
+        # Previous Version
+        # return np.array(list(self.__distance_matrix.values()))
+        distances_lists = [[item_distance.item_distance for item_distance in item_distances] for item_distances in
+                           self.__distance_matrix.values()]
+        return np.array(distances_lists)
+
+    @property
+    def size(self):
+        return self.__size
 
     @staticmethod
     def jaccard(s1: set, s2: set):
@@ -94,37 +156,16 @@ def get_developers_frame(developer_list: list[Developer]):
 
 if __name__ == "__main__":
     # --- Get Offers Dataframe
-    developers: list[Developer] = DeveloperRepository().get_developers()
+    offers: list[Offer] = OfferRepository().get_offers()
     distance_matrix = DistanceMatrix(
-        get_developers_frame(developers),
-        'Skills'
+        get_offers_frame(offers),
+        'RequiredSkills'
     )
-    print(get_developers_frame(developers).iloc[1])
 
-    # --- Test with Birch
-    from sklearn.cluster import Birch
-    from sklearn.decomposition import PCA
-    from sklearn.model_selection import GridSearchCV
-    from sklearn.metrics import silhouette_score
-
-
-    def birch_silhouette_scorer(model, data):
-        tmp_labels = model.fit_predict(data)
-        score = silhouette_score(data, tmp_labels)
-        return score
-
-
-    param_grid = {
-        'n_clusters': [3, 4, 5, 6],
-        'threshold': [0.5, 0.7, 0.8],
-        'branching_factor': [50, 100]
-    }
-
-    _pca = PCA(2)
-    _data = _pca.fit_transform(distance_matrix.matrix)
-    gsearch_pca = GridSearchCV(Birch(), param_grid, cv=5, scoring=birch_silhouette_scorer, n_jobs=-1)
-    gsearch_pca.fit(_data)
-
-    print(f"Best Parameters: {gsearch_pca.best_params_}")
-    print(f"Best Silhouette Score: {gsearch_pca.best_score_:.2f}")
-
+    from src.presentation import stub_offer
+    distance_matrix.add_item(stub_offer)
+    s = distance_matrix.get_item(1000)
+    print(s)
+    distance_matrix.delete_item(stub_offer)
+    s = distance_matrix.get_item(1000)
+    print(s)

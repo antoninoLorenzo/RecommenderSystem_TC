@@ -13,7 +13,7 @@ except ImportError as import_err:
     sys.exit(1)
 
 from src.presentation import UpdateEngine, RecommenderEngine, stub_offer, stub_developer
-from src.data.entity import Developer, Offer, Location, Skill, Language, Employer
+from src.data.entity import *
 
 
 class SearchAPI:

@@ -2,9 +2,6 @@
 Contains database Entities
 """
 from __future__ import annotations
-
-import json
-
 from src.data import Item, not_none
 
 
@@ -45,11 +42,9 @@ class Skill:
     def type(self):
         return self.__type
 
-
+"""
+NUKED
 class Location:
-    """
-    Location POPO
-    """
 
     @not_none('loc_id', 'name', 'latitude', 'longitude')
     def __init__(self, loc_id, name, latitude, longitude):
@@ -76,7 +71,7 @@ class Location:
 
     def __str__(self):
         return f'[{self.__id}]: {self.__name} ({self.__lat}, {self.__lon})'
-
+"""
 
 class Language:
     def __init__(self, lid, language_code):
@@ -102,7 +97,7 @@ class Developer(Item):
         self.__mail: str = mail
         self.__psw: str = psw
         self.__languages: list[Language] = languages
-        self.__location: Location = location
+        self.__location: str = location
         self.__skills: list = skills
 
     @staticmethod
@@ -117,16 +112,16 @@ class Developer(Item):
         bio = data['_Developer__bio']
         mail = data['_Developer__mail']
         psw = data['_Developer__psw']
-        location_data = data['_Developer__location']
+        location = data['_Developer__location']
 
         skills = Skill.from_list(data['_Developer__skills'])
 
-        location = Location(
-            location_data['_Location__id'],
-            location_data['_Location__name'],
-            location_data['_Location__lat'],
-            location_data['_Location__lon']
-        )
+        # location = Location(
+        #    location_data['_Location__id'],
+        #    location_data['_Location__name'],
+        #    location_data['_Location__lat'],
+        #    location_data['_Location__lon']
+        # )
 
         language = []
 
@@ -191,7 +186,7 @@ class Offer(Item):
                  description: str,
                  employer: Employer,
                  location_type: str,
-                 location: Location | None = None,
+                 location: str | None = None,
                  required_skills: list[Skill] | None = None,
                  required_languages: list[Language] | None = None):
         self.__id: int = id
@@ -229,8 +224,8 @@ class Offer(Item):
         return self.__location
 
     @property
-    def employer_id(self):
-        return self.__employer_id
+    def employer(self):
+        return self.__employer
 
     @property
     def skills(self):

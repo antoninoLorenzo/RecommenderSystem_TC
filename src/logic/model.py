@@ -8,7 +8,7 @@ from collections import Counter
 from abc import ABC, abstractmethod
 
 try:
-    from pandas import DataFrame
+    from pandas import DataFrame, concat
     from sklearn.cluster import Birch
     from sklearn.decomposition import PCA
 except ImportError as import_err:
@@ -17,7 +17,7 @@ except ImportError as import_err:
 
 from src import singleton
 from src.data import Item
-from src.data.entity import Developer, Offer, Skill, Language, Location
+from src.data.entity import Developer, Offer, Skill, Language
 from src.data.repository import DeveloperRepository, OfferRepository, SkillRepository
 from src.logic.distance_matrix import DistanceMatrix, get_offers_frame, get_developers_frame
 
@@ -152,6 +152,25 @@ class OfferModel(Model):
     def add_item(self, item: Item):
         if not isinstance(item, Offer):
             raise ValueError("[OfferModel] add_item expects an offer")
+        try:
+            self.__matrix.add_item(item)
+
+            self.__reduced_matrix = self.__reducer.fit_transform(self.__matrix.matrix)
+            self.__model.fit(self.__reduced_matrix)
+            self.__group_labels = self.__model.labels_
+
+            frame_row = DataFrame({
+                'id': item.id,
+                'Title': item.title,
+                'RequiredSkills': list({s.name for s in item.skills}),
+                'Group': -1
+            })
+            self.__frame = concat([self.__frame, frame_row], ignore_index=False)
+            self.__frame['Group'] = self.__group_labels
+        except Exception as err:
+            print('[!] Failed adding Offer')
+            print(self.__matrix.matrix)
+            raise ValueError("Couldn't add Item")
 
     def update_item(self, item: Item):
         if not isinstance(item, Offer):
@@ -216,12 +235,16 @@ class DeveloperModel(Model):
 if __name__ == "__main__":
     stub_developer = Developer(1, 'Antonino', 'Lorenzo', 'bio',
                                'anton@asd.com', 'DioCiao0003', [Language(1, 'it')],
-                               Location(1, 'Avellino', 83.0, 100.0),
-                               [Skill(1, 'Java', 'Programming Language')]
+                               'Avellino',
+                               [Skill(1000, "Python", "Programming Language")]
                                )
 
     offer_model: OfferModel = OfferModel()
+    from src.presentation import stub_offer
 
-    output = offer_model.similar_items(stub_developer)
-    for out in output:
-        print(out, end='\n\n')
+    offer_model.add_item(stub_offer)
+    res = offer_model.similar_items(stub_developer)
+    for r in res:
+        print(r.title)
+
+
