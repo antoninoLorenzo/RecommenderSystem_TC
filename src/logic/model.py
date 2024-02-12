@@ -79,6 +79,7 @@ class ModelManager:
 class OfferModel(Model):
     """
     Contains a Similarity Based model to recommend Offers to Developers.
+
     """
 
     def __init__(self):
