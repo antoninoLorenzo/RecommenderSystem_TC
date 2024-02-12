@@ -168,6 +168,9 @@ class OfferModel(Model):
             })
             self.__frame = concat([self.__frame, frame_row], ignore_index=False)
             self.__frame['Group'] = self.__group_labels
+
+            print(self.__frame[self.__frame['id'] == 1000])
+
         except Exception as err:
             print('[!] Failed adding Offer')
             print(self.__matrix.matrix)

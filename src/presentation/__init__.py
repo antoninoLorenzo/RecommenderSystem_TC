@@ -15,7 +15,8 @@ stub_developer = Developer(1000, 'Antonino', 'Lorenzo', 'bio',
                            'Avellino',
                            [Skill(1000, 'Java', 'Programming Language')]
                            )
-# OFFER_MODEL = OfferModel()
+
+OFFER_MODEL = OfferModel()
 
 
 class RecommenderEngine:
