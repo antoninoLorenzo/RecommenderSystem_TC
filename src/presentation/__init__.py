@@ -1,5 +1,6 @@
 from src.data import Item
 from src.data.entity import Offer, Developer, Skill, Location, Language, Employer
+from src.data.repository import OfferRepository
 from src.service.model import OfferModel
 
 stub_offer = Offer(1, 'Web Developer', 'active', 'desc',
@@ -16,15 +17,49 @@ stub_developer = Developer(1, 'Antonino', 'Lorenzo', 'bio',
                            )
 OFFER_MODEL = OfferModel()
 
+
 class RecommenderEngine:
+    """
+    Act as interface for business layers search operations.
+    """
+    @staticmethod
+    def search_offer(query: str, user: Developer):
+        """
+        :param query: a not empty query string
+        :param user: a Developer searching for an offer
+        """
+        if not isinstance(query, str) or not isinstance(user, Developer):
+            raise ValueError('[RecommenderEngine] search_offer expects str and Developer')
+        elif len(query) == 0:
+            raise ValueError('[RecommenderEngine] query must not be empty')
 
-    def search_offer(self, query: str, user: Developer):
-        # find offer from search given query and find similar offers using developer skills
-        # the result will be an ordered list with  the similar offers that were also found by search,
-        # then the offers found by query but not by similarity
-        return OFFER_MODEL.similar_items(user)
+        # Get Offers with indexing
+        search_offers: list[Offer] = OfferRepository().get_offers(query)
+        search_ids = [search.id for search in search_offers]
 
-    def recommend_developer(self, offer: Offer):
+        # Get Offers with recommendation
+        recommended_offers = OFFER_MODEL.similar_items(user)
+        recommended_ids = [recommended.id for recommended in recommended_offers]
+
+        # Get Common offers and remove from other lists
+        intersection = set(search_ids).intersection(set(recommended_ids))
+        common_offers = [offer for offer in search_offers + recommended_offers if offer.id in intersection]
+        search_offers = [offer for offer in search_offers if offer.id not in intersection]
+        recommended_offers = [offer for offer in recommended_offers if offer.id not in intersection]
+
+        # Create result
+        output = []
+        output.extend(common_offers)
+        while search_offers or recommended_offers:
+            if search_offers:
+                output.append(search_offers.pop(0))
+            if recommended_offers:
+                output.append(recommended_offers.pop(0))
+
+        return output
+
+    @staticmethod
+    def recommend_developer(offer: Offer):
         return DeveloperModelStub().similar_items(offer)
 
 
