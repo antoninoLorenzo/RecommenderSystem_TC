@@ -12,7 +12,7 @@ except ImportError as import_err:
     print(f'[!] ImportError: {import_err}')
     sys.exit(1)
 
-from src.controller import UpdateEngine, RecommenderEngine, stub_offer, stub_developer
+from src.presentation import UpdateEngine, RecommenderEngine, stub_offer, stub_developer
 from src.data.entity import Developer, Offer, Location, Skill, Language, Employer
 
 
@@ -33,9 +33,9 @@ class SearchAPI:
 
         @self.__app.post('/engine/v1/offers')
         async def search_offers(request: Request):
-            # content = await request.json()
-            RecommenderEngine().search_offer('', stub_developer)
-            return [stub_offer, stub_offer]
+            content = await request.json()
+            developer = Developer.from_dict(content[1])
+            return RecommenderEngine().search_offer('', stub_developer)
 
         @self.__app.post('/engine/v1/developers')
         async def recommend_developers(request: Request):

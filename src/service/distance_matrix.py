@@ -32,7 +32,7 @@ class DistanceMatrix:
             for other_item_id, other_item_data in frame_data.items():
                 if item_id != other_item_id:
                     distances.append(
-                        self.__jaccard(
+                        self.jaccard(
                             item_data,
                             other_item_data
                         )
@@ -62,7 +62,7 @@ class DistanceMatrix:
         return np.array(list(self.__distance_matrix.values()))
 
     @staticmethod
-    def __jaccard(s1: set, s2: set):
+    def jaccard(s1: set, s2: set):
         """
         :return: distance between two item-sets
         """

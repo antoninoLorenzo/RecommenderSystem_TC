@@ -22,6 +22,17 @@ class Skill:
         self.__name: str = name
         self.__type: str = type
 
+    @staticmethod
+    def from_list(data: list) -> list[Skill]:
+        skills = []
+        for skill in data:
+            skills.append(Skill(
+                id=skill['_Skill__id'],
+                name=skill['_Skill__name'],
+                type=skill['_Skill__type']
+            ))
+        return skills
+
     @property
     def id(self):
         return self.__id
@@ -100,21 +111,21 @@ class Developer(Item):
         Creates a Developer instance from a JSON string.
         """
 
-        dev_id = data['dev_id']
-        f_name = data['f_name']
-        l_name = data['l_name']
-        bio = data['bio']
-        mail = data['mail']
-        psw = data['psw']
-        location_data = data['location']
+        dev_id = data['_Developer__id']
+        f_name = data['_Developer__f_name']
+        l_name = data['_Developer__l_name']
+        bio = data['_Developer__bio']
+        mail = data['_Developer__mail']
+        psw = data['_Developer__psw']
+        location_data = data['_Developer__location']
 
-        skills = data['skills']
+        skills = Skill.from_list(data['_Developer__skills'])
 
         location = Location(
-            location_data['loc_id'],
-            location_data['loc_name'],
-            location_data['lat'],
-            location_data['lon']
+            location_data['_Location__id'],
+            location_data['_Location__name'],
+            location_data['_Location__lat'],
+            location_data['_Location__lon']
         )
 
         language = []

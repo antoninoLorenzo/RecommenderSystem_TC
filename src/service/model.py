@@ -4,6 +4,7 @@ ModelManager should be used to interact with OfferModel and DeveloperModel, all 
 to interact with those are specified in Model interface.
 """
 import sys
+from collections import Counter
 from abc import ABC, abstractmethod
 
 try:
@@ -82,17 +83,17 @@ class OfferModel(Model):
 
     def __init__(self):
         try:
-            print('---- Initializing OfferModel')
-            self.__offers = OfferRepository().get_offers()
-            self.__frame = get_offers_frame(self.__offers)
+            print('[i] Initializing OfferModel')
+            self.__offers: list[Offer] = OfferRepository().get_offers()
+            self.__frame: DataFrame = get_offers_frame(self.__offers)
 
-            print('---- Building DistanceMatrix')
+            print('[i] Building DistanceMatrix')
             self.__matrix = DistanceMatrix(
                 self.__frame,
                 'RequiredSkills'
             )
 
-            print('---- Training BIRCH')
+            print('[i] Training BIRCH')
             self.__model = Birch(branching_factor=50, n_clusters=3, threshold=0.7)
             self.__reducer = PCA(2)
             self.__reduced_matrix = self.__reducer.fit_transform(self.__matrix.matrix)
@@ -100,9 +101,9 @@ class OfferModel(Model):
             self.__group_labels = self.__model.labels_
             self.__frame['Group'] = self.__group_labels
         except Exception as err:
-            print(f'---- Error initializing OfferModel\n{err}')
+            print(f'[!] Error initializing OfferModel\n{err}')
             sys.exit(1)
-        print('---- Offer model successfully initialized')
+        print('[i] Offer model successfully initialized')
 
     def get_instance(*args, **kwargs):
         """
@@ -111,12 +112,36 @@ class OfferModel(Model):
         raise NotImplementedError()
 
     def similar_items(self, item: Item) -> list[Item]:
+        """
+        :param item: the developer making the request
+        """
         if not isinstance(item, Developer):
             raise ValueError("[OfferModel] similar_items expects a Developer")
 
+        # Step 1: Get Nearest Offers to Developer
         skill_set = {s.name for s in item.skills}
-        print(skill_set)
-        return []
+        distances = []
+        for offer in self.__offers:
+            distances.append({
+                'id': offer.id,
+                'distance': DistanceMatrix.jaccard(
+                    {s.name for s in offer.skills},
+                    skill_set
+                )
+            })
+        most_similar_offers = [offer['id'] for offer in distances if offer['distance'] < 0.1]
+
+        # Step 2: Get Developer Group
+        groups = self.__frame.iloc[most_similar_offers]['Group'].tolist()
+        group_counts = Counter(groups)
+        print(f'Group Counts: {group_counts}')
+        dev_group = group_counts.most_common(1)[0][0]
+        print(f'Group: {dev_group}')
+
+        # Step 3: Get most similar offers in group
+        group_ids = self.__frame[self.__frame['Group'] == dev_group]['id'].tolist()
+        offers = [offer['id'] for offer in distances if offer['distance'] < 0.7 and offer['id'] in group_ids]
+        return [o for o in self.__offers if o.id in offers]
 
     def add_item(self, item: Item):
         if not isinstance(item, Offer):
@@ -139,17 +164,17 @@ class DeveloperModel(Model):
 
     def __init__(self):
         try:
-            print('---- Initializing DeveloperModel')
+            print('[i] Initializing DeveloperModel')
             self.__developers = DeveloperRepository().get_developers()
             self.__frame = get_developers_frame(self.__developers)
 
-            print('---- Building DistanceMatrix')
+            print('[i] Building DistanceMatrix')
             self.__matrix = DistanceMatrix(
                 self.__frame,
                 'Skills'
             )
 
-            print('---- Training BIRCH')
+            print('[i] Training BIRCH')
             self.__model = Birch(branching_factor=50, n_clusters=3, threshold=0.5)
             self.__reducer = PCA(2)
             self.__reduced_matrix = self.__reducer.fit_transform(self.__matrix.matrix)
@@ -157,9 +182,9 @@ class DeveloperModel(Model):
             self.__group_labels = self.__model.labels_
             self.__frame['Group'] = self.__group_labels
         except Exception as err:
-            print(f'---- Error initializing DeveloperModel\n{err}')
+            print(f'[!] Error initializing DeveloperModel\n{err}')
             sys.exit(1)
-        print('---- Developer model successfully initialized')
+        print('[i] Developer model successfully initialized')
 
     def get_instance(*args, **kwargs):
         """
@@ -191,6 +216,6 @@ if __name__ == "__main__":
 
     offer_model: OfferModel = OfferModel()
 
-    offer_model.similar_items(stub_developer)
-
-    developer_model: DeveloperModel = DeveloperModel()
+    output = offer_model.similar_items(stub_developer)
+    for out in output:
+        print(out, end='\n\n')
