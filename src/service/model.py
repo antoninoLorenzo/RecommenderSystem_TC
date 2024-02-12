@@ -129,14 +129,21 @@ class OfferModel(Model):
                     skill_set
                 )
             })
-        most_similar_offers = [offer['id'] for offer in distances if offer['distance'] < 0.1]
+
+        most_similar_offers = []
+        for similarity in [0.1, 0.2, 0.8]:
+            [most_similar_offers.append(offer['id']) for offer in distances if offer['distance'] < similarity]
+            print(f'{similarity}: {most_similar_offers}')
+            if len(most_similar_offers) != 0:
+                break
+
+        if len(most_similar_offers) == 0:
+            return []
 
         # Step 2: Get Developer Group
         groups = self.__frame.iloc[most_similar_offers]['Group'].tolist()
         group_counts = Counter(groups)
-        print(f'Group Counts: {group_counts}')
         dev_group = group_counts.most_common(1)[0][0]
-        print(f'Group: {dev_group}')
 
         # Step 3: Get most similar offers in group
         group_ids = self.__frame[self.__frame['Group'] == dev_group]['id'].tolist()

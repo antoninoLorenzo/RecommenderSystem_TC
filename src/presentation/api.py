@@ -35,7 +35,7 @@ class SearchAPI:
         async def search_offers(request: Request):
             content = await request.json()
             developer = Developer.from_dict(content[1])
-            return RecommenderEngine().search_offer('', stub_developer)
+            return RecommenderEngine().search_offer('', developer)
 
         @self.__app.post('/engine/v1/developers')
         async def recommend_developers(request: Request):
