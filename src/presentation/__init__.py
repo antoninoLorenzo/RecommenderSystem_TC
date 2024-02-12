@@ -1,7 +1,7 @@
 from src.data import Item
 from src.data.entity import Offer, Developer, Skill, Location, Language, Employer
 from src.data.repository import OfferRepository
-from src.service.model import OfferModel
+from src.logic.model import OfferModel
 
 stub_offer = Offer(1, 'Web Developer', 'active', 'desc',
                    Employer(1, "Antonino", "Lorenzo", "anton@gmail.com", "DioCiao0003", "asd"),

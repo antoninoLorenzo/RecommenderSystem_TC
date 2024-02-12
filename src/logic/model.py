@@ -19,7 +19,7 @@ from src import singleton
 from src.data import Item
 from src.data.entity import Developer, Offer, Skill, Language, Location
 from src.data.repository import DeveloperRepository, OfferRepository, SkillRepository
-from src.service.distance_matrix import DistanceMatrix, get_offers_frame, get_developers_frame
+from src.logic.distance_matrix import DistanceMatrix, get_offers_frame, get_developers_frame
 
 
 class Model(ABC):
@@ -133,7 +133,6 @@ class OfferModel(Model):
         most_similar_offers = []
         for similarity in [0.1, 0.2, 0.8]:
             [most_similar_offers.append(offer['id']) for offer in distances if offer['distance'] < similarity]
-            print(f'{similarity}: {most_similar_offers}')
             if len(most_similar_offers) != 0:
                 break
 
