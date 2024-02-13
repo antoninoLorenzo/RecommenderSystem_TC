@@ -120,8 +120,7 @@ if __name__ == "__main__":
 
     script.write('INSERT INTO offer VALUES\n')
     for i, offer in enumerate(offers):
-        desc = offer['description'].encode(errors='ignore')
-        desc = str(desc).replace('\"', '\\"')
+        desc = "Questa descrizione è stata autogenerata per motivi di testing"
         name = offer['name'].encode(errors='ignore')
         name = str(name).replace('\"', '\\"')
         script.write(f'''({offer['id']}, "{name}", "OPEN", "{desc}", "{offer['type']}", 1, "{offer['location']}")''')
