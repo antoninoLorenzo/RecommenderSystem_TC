@@ -231,6 +231,11 @@ class Offer(Item):
     def skills(self):
         return self.__skills
 
+    @skills.setter
+    def skills(self, value: list[Skill]):
+        if value:
+            self.__skills = value
+
     def __str__(self):
         return (f'[{self.__id}]: {self.__title} ({self.__state})\n'
                 f'Employer: \n{self.__employer}\n'

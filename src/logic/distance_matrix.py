@@ -99,7 +99,7 @@ class DistanceMatrix:
             raise ValueError('[!] DistanceMatrix: add_item requires Offer or Developer')
 
         for key, value in self.__distance_matrix.items():
-            if key != 1000:
+            if key != item.id:
                 for distance in value:
                     if item.id == distance.item_id:
                         value.remove(distance)

@@ -155,34 +155,48 @@ class OfferModel(Model):
             raise ValueError("[OfferModel] add_item expects an offer")
         try:
             self.__matrix.add_item(item)
-
             self.__reduced_matrix = self.__reducer.fit_transform(self.__matrix.matrix)
             self.__model.fit(self.__reduced_matrix)
             self.__group_labels = self.__model.labels_
-
+            unique_skills = {s.name for s in item.skills}
             frame_row = DataFrame({
                 'id': item.id,
                 'Title': item.title,
-                'RequiredSkills': list({s.name for s in item.skills}),
+                'RequiredSkills': [list(unique_skills)],
                 'Group': -1
             })
             self.__frame = concat([self.__frame, frame_row], ignore_index=False)
             self.__frame['Group'] = self.__group_labels
-
-            print(self.__frame[self.__frame['id'] == 1000])
-
         except Exception as err:
             print('[!] Failed adding Offer')
-            print(self.__matrix.matrix)
             raise ValueError("Couldn't add Item")
 
     def update_item(self, item: Item):
         if not isinstance(item, Offer):
             raise ValueError("[OfferModel] update_item expects an offer")
+        try:
+            self.remove_item(item)
+            self.add_item(item)
+        except Exception as err:
+            print('[!] Failed updating item')
 
     def remove_item(self, item: Item):
         if not isinstance(item, Offer):
             raise ValueError("[OfferModel] remove_item expects an offer")
+
+        try:
+            self.__matrix.delete_item(item)
+            self.__reduced_matrix = self.__reducer.fit_transform(self.__matrix.matrix)
+            self.__model.fit(self.__reduced_matrix)
+            self.__group_labels = self.__model.labels_
+            self.__frame = self.__frame[self.__frame['id'] != item.id]
+            self.__frame['Group'] = self.__group_labels
+        except Exception as err:
+            print('[!] Failed removing Offer')
+            raise ValueError("Couldn't remove item")
+
+    def get_item(self, item_id):
+        return self.__frame[self.__frame['id'] == item_id]
 
 
 @singleton
@@ -232,23 +246,3 @@ class DeveloperModel(Model):
 
     def remove_item(self, item: Item):
         raise NotImplementedError()
-
-
-# --- Development Only
-
-if __name__ == "__main__":
-    stub_developer = Developer(1, 'Antonino', 'Lorenzo', 'bio',
-                               'anton@asd.com', 'DioCiao0003', [Language(1, 'it')],
-                               'Avellino',
-                               [Skill(1000, "Python", "Programming Language")]
-                               )
-
-    offer_model: OfferModel = OfferModel()
-    from src.presentation import stub_offer
-
-    offer_model.add_item(stub_offer)
-    res = offer_model.similar_items(stub_developer)
-    for r in res:
-        print(r.title)
-
-
