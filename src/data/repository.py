@@ -17,6 +17,29 @@ from src.data import DatabaseEngineFactory
 from src.data.entity import *
 
 
+def get_offers_frame(offer_list: list[Offer]):
+    offers_dict = []
+    for o in offer_list:
+        skill_set = {s.name for s in o.skills}
+        offers_dict.append({
+            'id': o.id,
+            'Title': o.title,
+            'RequiredSkills': skill_set
+        })
+    return DataFrame(offers_dict)
+
+
+def get_developers_frame(developer_list: list[Developer]):
+    developers_dict = []
+    for d in developer_list:
+        skills_set = {s.name for s in d.skills}
+        developers_dict.append({
+            'id': d.developer_id,
+            'Skills': skills_set
+        })
+    return DataFrame(developers_dict)
+
+
 class SkillRepository:
     def __init__(self):
         self.__session: Session = DatabaseEngineFactory.get_instance().session

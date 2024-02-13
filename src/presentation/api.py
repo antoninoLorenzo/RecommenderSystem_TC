@@ -2,6 +2,8 @@
 asd
 """
 
+import os
+os.environ['LOKY_MAX_CPU_COUNT'] = '4'
 import sys
 from pprint import pprint
 
@@ -12,8 +14,8 @@ except ImportError as import_err:
     print(f'[!] ImportError: {import_err}')
     sys.exit(1)
 
-from src.presentation import UpdateEngine, RecommenderEngine, stub_offer, stub_developer
 from src.data.entity import *
+from src.logic.engine import UpdateEngine, RecommenderEngine, stub_offer, stub_developer
 
 
 class SearchAPI:
