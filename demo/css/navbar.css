@@ -201,15 +201,35 @@
     font-size: 26px;
 }
 
+@keyframes showSearchDesk {
+    0% {
+        width: 0;
+        display: none;
+    }
+
+    100% {
+        width: 200px;
+        border-bottom: 2px solid var(--purple);
+
+    }
+}
+
 #dsk-search-input{
-    width: 200px;
+    width: 0;
+    padding: 0;
     outline: none;
     font-size: 18px;
     border-top: 0;
     border-left: 0;
     border-right: 0;
-    border-bottom: 2px solid var(--purple);
     color: var(--dark-gray);
+}
+
+#dsk-nav-wrap:hover #dsk-search-input{
+    animation-name: showSearchDesk;
+    animation-duration: 0.4s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
 }
 
 #dsk-search-button {

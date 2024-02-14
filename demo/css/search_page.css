@@ -1,5 +1,13 @@
 /* Extra small devices (phones, 600px and down) */
-@media only screen and (max-width: 600px) {  }
+@media only screen and (max-width: 600px) {
+    #of-search-wrap h2 {
+        font-size: 22px !important;
+    }
+
+    .search-out-query {
+        font-size: 22px !important;
+    }
+}
 
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 600px) {
@@ -324,4 +332,18 @@
 }
 #of-def-rec-wrap h2 {
     font-size: 28px;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity:  0.1;
+    }
+
+    100% {
+        opacity:  1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.1s ease-in 0s  1 normal none running;
 }

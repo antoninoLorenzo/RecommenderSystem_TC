@@ -66,9 +66,9 @@ class DatabaseEngineFactory:
     def __init__(self):
         try:
             self.__create_engine = create_engine(DB_LINK)
+            self.__session_factory = sessionmaker(bind=self.__create_engine)
         except SQLAlchemyError as alchemy_err:
             print(f'[!] {alchemy_err}')
-        self.__session_factory = sessionmaker(bind=self.__create_engine)
 
     def get_instance(*args, **kwargs):
         raise NotImplementedError()

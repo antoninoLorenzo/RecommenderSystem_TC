@@ -142,7 +142,7 @@ $(document).ready(() => {
         if (items.length > 0) {
             items.forEach((item) => {
                let item_card = $("<div>")
-                   .addClass('item-card');
+                   .addClass('item-card fade-in');
 
                if (type === 'offer')
                    createOfferCard(item, item_card);
