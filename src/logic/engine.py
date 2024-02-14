@@ -51,15 +51,17 @@ class RecommenderEngine:
         recommended_offers = [offer for offer in recommended_offers if offer.id not in intersection]
 
         # Create result
-        output = []
-        output.extend(common_offers)
+        output = set(common_offers)
         while search_offers or recommended_offers:
             if search_offers:
-                output.append(search_offers.pop(0))
+                output.add(search_offers.pop(0))
             if recommended_offers:
-                output.append(recommended_offers.pop(0))
-
+                output.add(recommended_offers.pop(0))
         return output
+
+    @staticmethod
+    def recommend_offer(developer: Developer):
+        return OFFER_MODEL.similar_items(developer)
 
     @staticmethod
     def recommend_developer(offer: Offer):

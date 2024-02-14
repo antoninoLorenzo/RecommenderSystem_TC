@@ -244,6 +244,7 @@ class OfferModel(Model):
 
         # Step 1: Get Nearest Offers to Developer
         skill_set = {s.name for s in item.skills}
+
         distances = []
         for offer in self.__offers:
             distances.append({
@@ -255,10 +256,12 @@ class OfferModel(Model):
             })
 
         most_similar_offers = []
+        max_similarity = 0
+        similarity_dict = {0.1: 0.6, 0.2: 0.7, 0.8: 0.9}
         for similarity in [0.1, 0.2, 0.8]:
             [most_similar_offers.append(offer['id']) for offer in distances if offer['distance'] < similarity]
             if len(most_similar_offers) != 0:
-                break
+                max_similarity = similarity
 
         if len(most_similar_offers) == 0:
             return []
@@ -270,7 +273,7 @@ class OfferModel(Model):
 
         # Step 3: Get most similar offers in group
         group_ids = self.__frame[self.__frame['Group'] == dev_group]['id'].tolist()
-        offers = [offer['id'] for offer in distances if offer['distance'] < 0.7 and offer['id'] in group_ids]
+        offers = [offer['id'] for offer in distances if offer['distance'] <= similarity_dict[max_similarity] and offer['id'] in group_ids]
         return [o for o in self.__offers if o.id in offers]
 
     def add_item(self, item: Item):
@@ -391,7 +394,7 @@ class DeveloperModel(Model):
 
         # Step 3: Get most similar offers in group
         group_ids = self.__frame[self.__frame['Group'] == dev_group]['id'].tolist()
-        developers = [offer['id'] for offer in distances if offer['distance'] < 0.7 and offer['id'] in group_ids]
+        developers = [offer['id'] for offer in distances if offer['distance'] < 0.8 and offer['id'] in group_ids]
         return [o for o in self.__developers if o.developer_id in developers]
 
     def add_item(self, item: Item):
