@@ -5,6 +5,7 @@ class Location {
 
     toJSON() {
         return {
+            _Location__id: 1,
             _Location__name: this.name,
         }
     }

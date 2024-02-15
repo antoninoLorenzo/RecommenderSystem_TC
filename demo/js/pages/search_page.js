@@ -10,8 +10,10 @@ $(document).ready(() => {
         'Avellino',
         [
             new Skill(1, 'Python', 'Programming Language'),
-            new Skill(2, 'Pandas', 'Framework'),
-            new Skill(3, 'Tensorflow', 'Framework')
+            new Skill(2, 'TensorFlow', 'Framework'),
+            new Skill(3, 'PyTorch', 'Framework'),
+            new Skill(3, 'Pandas', 'Framework'),
+            new Skill(3, 'MySQL', 'Database'),
         ],
         new Languages('italiano')
     )
@@ -208,10 +210,6 @@ $(document).ready(() => {
         content.append(description, buttonSection)
 
         card.append(headerWrapper, meta, content)
-    }
-
-    function createDeveloperCard() {
-
     }
 
     recommendOffers(mockDeveloper)

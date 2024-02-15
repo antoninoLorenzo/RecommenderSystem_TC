@@ -8,7 +8,10 @@ stub_offer = Offer(1000, 'Web Developer', 'active', 'desc',
                    Employer(1000, "Antonino", "Lorenzo", "anton@gmail.com", "DioCiao0003", "asd"),
                    'Remote',
                    "Avellino Italia",
-                   [Skill(1000, "Python", "Programming Language")],
+                   [
+                       Skill(1000, "Python", "Programming Language"),
+                       Skill(1001, "Pandas", "Framework")
+                   ],
                    [Language(1000, "it")])
 
 stub_developer = Developer(1000, 'Antonino', 'Lorenzo', 'bio',
@@ -57,6 +60,7 @@ class RecommenderEngine:
                 output.add(search_offers.pop(0))
             if recommended_offers:
                 output.add(recommended_offers.pop(0))
+
         return output
 
     @staticmethod
@@ -65,7 +69,9 @@ class RecommenderEngine:
 
     @staticmethod
     def recommend_developer(offer: Offer):
-        return DEVELOPER_MODEL.similar_items(offer)
+        output = DEVELOPER_MODEL.similar_items(offer)
+        return set(output)
+
 
 
 class UpdateEngine:

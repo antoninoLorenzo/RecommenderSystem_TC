@@ -4,12 +4,13 @@ ModelManager should be used to interact with OfferModel and DeveloperModel, all 
 to interact with those are specified in Model interface.
 """
 import sys
+import time
 from collections import Counter
 from abc import ABC, abstractmethod
 
 try:
     import numpy as np
-    from pandas import DataFrame, concat
+    from pandas import DataFrame, concat, Series
     from sklearn.cluster import Birch
     from sklearn.decomposition import PCA
 except ImportError as import_err:
@@ -378,24 +379,48 @@ class DeveloperModel(Model):
                 )
             })
 
-        most_similar_offers = []
+        most_similar_devs = []
+        max_similarity = 0
+        similarity_dict = {0.1: 0.6, 0.2: 0.7, 0.8: 0.9}
         for similarity in [0.1, 0.2, 0.8]:
-            [most_similar_offers.append(offer['id']) for offer in distances if offer['distance'] < similarity]
-            if len(most_similar_offers) != 0:
+            for developer in distances:
+                if developer['distance'] < similarity:
+                    most_similar_devs.append(developer['id'].tolist()[0])
+            if len(most_similar_devs) != 0:
+                max_similarity = similarity
                 break
 
-        if len(most_similar_offers) == 0:
+        if len(most_similar_devs) == 0:
             return []
 
         # Step 2: Get Developer Group
-        groups = self.__frame.iloc[most_similar_offers]['Group'].tolist()
+        groups = self.__frame.iloc[most_similar_devs]['Group'].tolist()
         group_counts = Counter(groups)
-        dev_group = group_counts.most_common(1)[0][0]
+        offer_group = group_counts.most_common(1)[0][0]
 
         # Step 3: Get most similar offers in group
-        group_ids = self.__frame[self.__frame['Group'] == dev_group]['id'].tolist()
-        developers = [offer['id'] for offer in distances if offer['distance'] < 0.8 and offer['id'] in group_ids]
-        return [o for o in self.__developers if o.developer_id in developers]
+        ids = self.__frame[self.__frame['Group'] == offer_group]['id'].tolist()
+        group_ids = [i.tolist()[0] for i in ids]
+
+        tmp_developers = []
+        for developer in distances:
+            if developer['distance'] < similarity_dict[max_similarity]:
+                if developer['id'].tolist()[0] in group_ids or len(tmp_developers) < 2:
+                    tmp_developers.append(developer)
+
+        developer_ids = []
+        for t in tmp_developers:
+            for v in t.values():
+                if isinstance(v, Series):
+                    developer_ids.append(v.tolist()[0])
+
+        output = set()
+        for out in self.__developers:
+            _id = out.developer_id.tolist()[0]
+            if _id in developer_ids:
+                output.add(out)
+
+        return list(output)
 
     def add_item(self, item: Item):
         if not isinstance(item, Developer):

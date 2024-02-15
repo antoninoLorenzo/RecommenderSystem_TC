@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="it" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Turing Careers - User page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/x-icon" href="static/tc_logo.svg">
+    <link rel="stylesheet" type="text/css" href="css/commons.css"/>
+    <link rel="stylesheet" type="text/css" href="css/navbar.css"/>
+    <link rel="stylesheet" href="css/employer_page.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+    <div>
+        <div id="mb-nav-wrap" class="navbar">
+            <div id="mb-nav" class="grid-3fr">
+                <div class="mb-nav-button grid-center">
+                    <i class="bi bi-search bi-icon-dev hover-dissolve"></i>
+                </div>
+                <div class="mb-nav-button grid-center">
+                    <img class="tc-logo" src="static/tc_logo.svg" alt=""/>
+                </div>
+                <div class="mb-nav-button grid-center">
+                    <i class="bi bi-list bi-icon-dev hover-dissolve"></i>
+                    <input type="checkbox" id="mb-nav-hamburger-toggle"/>
+                    <div id="mb-nav-menu" class="display-none">
+                        <div id="mb-nav-menu-btn-wrapper">
+                            <div class="mb-nav-menu-button">
+                                <i class="bi bi-person-circle mb-account-icon bi-icon-dev"></i>
+                                <p class="inter-bold">Profile</p>
+                            </div>
+                            <div class="mb-nav-menu-button">
+                                <i class="bi bi-chat-left-text-fill dsk-account-icon bi-icon-dev"></i>
+                                <p class="inter-bold">Inbox</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="dsk-nav-wrap" class="navbar">
+            <div id="dsk-nav" class="grid-3fr">
+                <div class="dsk-nav-button grid-center">
+                    <div id="dsk-nav-search-bar">
+                        <i id="dsk-search-button" class="bi bi-search search-icon"></i>
+                        <input id="dsk-search-input" type="text" class="inter-regular"/>
+                    </div>
+                </div>
+                <div class="dsk-nav-button grid-center">
+                    <img class="tc-logo" src="static/tc_logo.svg" alt=""/>
+                </div>
+                <div class="dsk-nav-button dsk-account-section">
+                    <div class="grid-center">
+                        <div class="dsk-nav-btn">
+                            <i class="bi bi-chat-left-text-fill dsk-account-icon bi-icon-dev hover-dissolve"></i>
+                            <p class="inter-bold">Inbox</p>
+                        </div>
+                    </div>
+                    <div class="grid-center">
+                        <div id="dsk-nav-account-button" class="dsk-nav-btn">
+                            <i class="bi bi-person-circle dsk-account-icon bi-icon-dev"></i>
+                            <p class="inter-bold">Profile</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employer Page -->
+    <div id="employer-page-main">
+        <div class="profile-header-wrapper flex-center">
+            <div class="profile-header">
+                <div class="info-wrapper">
+                    <div class="name-wrapper">
+                        <h2 class="user-name no-select inter-bold ">Nome Employer</h2>
+                    </div>
+                    <div class="user-info-wrapper">
+                        <div id="employer-email" class="user-info">
+                            <p class="inter-light"><i class="bi bi-envelope"></i>email@email.com</p>
+                        </div>
+                        <div id="employer-company" class="user-info">
+                            <p class="inter-light"><i class="bi bi-building"></i>Employer company</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-modify-wrapper">
+                    <div class="user-modify">
+                        <p class="inter-medium"><i class="bi bi-pencil"></i>Modifica Profilo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-content-wrapper">
+            <div class="profile-content">
+                <div id="emp-offers-wrap">
+                    <h2 class="inter-bold no-select">Your Offers</h2>
+                    <div id="emp-offers-list">
+                        <div id="empty-offer-list" class="flex-center">
+                            <h3 class="inter-light no-select">No offers</h3>
+                        </div>
+                        <!-- Employer Offer Template -->
+                        <!--
+                        <div class="item-card fade-in">
+                            <div class="of-offer-card-header">
+                                <div class="of-offer-head no-select">
+                                    <h3 class="of-offer-employer-name inter-medium">Offer Employer</h3>
+                                    <h1 class="of-offer-tile inter-bold no-select">Offer Title</h1>
+                                </div>
+                                <div class="show-developers-wrap">
+                                    <div class="show-dev-tooltip inter-bold">Similar Developers</div>
+                                    <p class="show-dev-button inter-bold">+</p>
+                                    <input type="checkbox" class="show-dev-checkbox"/>
+                                </div>
+                            </div>
+                            <div class="of-offer-card-meta inter-regular no-select">
+                                <h3>Location</h3>
+                            </div>
+                            <div class="of-offer-card-content">
+                                <div class="of-offer-desc-preview">
+                                    <p class="inter-light no-select">Offer Description</p>
+                                </div>
+                                <div class="of-offer-button">
+                                    <div class="flex-center">
+                                        <a class="inter-bold no-select">Dettagli</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="of-offer-matching-developers display-none">
+                                <h2 class="inter-bold no-select">Matching Developers</h2>
+                                <div class="offer-matching-developers-list">
+
+                                    <div class="item-card fade-in">
+                                        <div class="dev-generals">
+                                            <h3 class="dev-location inter-medium">Developer Location</h3>
+                                            <h1 class="dev-name inter-bold no-select">Developer Name</h1>
+                                        </div>
+                                        <ul class="dev-skills">
+                                            <li class="inter-light no-select">Python</li>
+                                            <li class="inter-light no-select">Pandas</li>
+                                            <li class="inter-light no-select">TensorFlow</li>
+                                            <li class="inter-light no-select">...</li>
+                                        </ul>
+                                        <div class="dev-content">
+                                            <div class="dev-desc-preview">
+                                                <p class="inter-light no-select">Developer Bio</p>
+                                            </div>
+                                            <div class="dev-details-button">
+                                                <div class="flex-center">
+                                                    <a class="inter-bold no-select">Dettagli</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="js/shared/navbar.js"></script>
+    <script type="text/javascript" src="js/pages/employer_page.js"></script>
+    <script type="text/javascript" src="js/model/skills.js"></script>
+    <script type="text/javascript" src="js/model/locations.js"></script>
+    <script type="text/javascript" src="js/model/languages.js"></script>
+    <script type="text/javascript" src="js/model/offer.js"></script>
+    <script type="text/javascript" src="js/model/employer.js"></script>
+    <script type="text/javascript" src="js/model/developer.js"></script>
+</body>
+</html>

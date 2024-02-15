@@ -56,8 +56,25 @@ class SearchAPI:
 
         @self.__app.post('/engine/v1/developers')
         async def recommend_developers(request: Request):
-            RecommenderEngine.recommend_developer(stub_offer)
-            return [stub_developer, stub_developer]
+            content = await request.json()
+            offer = Offer.from_dict(content)
+            output = RecommenderEngine.recommend_developer(offer)
+            _output = []
+            for o in output:
+                out = o.to_dict()
+                _id = out['_Developer__id'].tolist()[0]
+                out['_Developer__id'] = _id
+
+                _languages = []
+                for l in out['_Developer__languages']:
+                    _lang_id = l['_Language__id'].tolist()[0]
+                    _lang_code = l['_Language__code']
+                    _language = Language(_lang_id, _lang_code)
+                    _languages.append(_language)
+                out['_Developer__languages'] = _languages
+
+                _output.append(out)
+            return _output
 
         @self.__app.post('/engine/v1/add')
         async def add(request: Request):

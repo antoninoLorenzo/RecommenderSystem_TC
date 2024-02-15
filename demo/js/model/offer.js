@@ -12,6 +12,10 @@ class Offer {
             this.location = undefined;
     }
 
+    setId(offer_id) {
+        this.id = offer_id
+    }
+
     validate() {
         // TODO: implement client side validation of offers
         return true;
@@ -19,6 +23,7 @@ class Offer {
 
     toJSON() {
         return {
+            _Offer__id: this.id ? this.id : 1,
             _Offer__title: this.title,
             _Offer__description: this.description,
             _Offer__state: 'ACTIVE',

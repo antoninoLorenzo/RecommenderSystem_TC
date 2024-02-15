@@ -30,6 +30,13 @@ class Skill:
             ))
         return skills
 
+    def to_dict(self):
+        return {
+            '_Skill__id': self.__id,
+            '_Skill__name': self.__name,
+            '_Skill__type': self.__type
+        }
+
     @property
     def id(self):
         return self.__id
@@ -77,6 +84,19 @@ class Language:
     def __init__(self, lid, language_code):
         self.__id = lid
         self.__code = language_code
+
+    @staticmethod
+    def from_dict(data: dict) -> Language:
+        lid = data['_Language__id']
+        code = data['_Language__code']
+
+        return Language(lid, code)
+
+    def to_dict(self):
+        return {
+            '_Language__id': self.__id,
+            '_Language__code': self.__code
+        }
 
     @property
     def code(self):
@@ -134,6 +154,19 @@ class Developer(Item):
                 f'Location: {self.__location}\n'
                 f'Bio: \n{self.__bio}\n')
 
+    def to_dict(self):
+        return {
+            '_Developer__id': self.__id,
+            '_Developer__f_name': self.__f_name,
+            '_Developer__l_name': self.__l_name,
+            '_Developer__bio': self.__bio,
+            '_Developer__mail': self.__mail,
+            '_Developer__psw': self.__psw,
+            '_Developer__languages': [lang.to_dict() for lang in self.__languages],
+            '_Developer__location': self.__location,
+            '_Developer__skills': [skill.to_dict() for skill in self.__skills]
+        }
+
     @property
     def developer_id(self):
         return self.__id
@@ -163,6 +196,7 @@ class Developer(Item):
         return self.__skills
 
 
+
 class Employer:
     def __init__(self, emp_id, f_name, l_name, mail, psw, company_name):
         self.__id: int = emp_id
@@ -171,6 +205,17 @@ class Employer:
         self.__mail: str = mail
         self.__psw: str = psw
         self.__company = company_name
+
+    @staticmethod
+    def from_dict(data: dict) -> Employer:
+        emp_id = data['_Employer__id']
+        f_name = data['_Employer__f_name']
+        l_name = data['_Employer__l_name']
+        mail = data['_Employer__mail']
+        psw = data['_Employer__psw']
+        company = data['_Employer__company']
+
+        return Employer(emp_id, f_name, l_name, mail, psw, company)
 
 
 class Offer(Item):
@@ -199,6 +244,26 @@ class Offer(Item):
         self.__skills = required_skills
         self.__languages = required_languages
 
+    @staticmethod
+    def from_dict(data: dict) -> Offer:
+        offer_id = data['_Offer__id']
+        title = data['_Offer__title']
+        desc = data['_Offer__description']
+        state = data['_Offer__state']
+        loc_type = data['_Offer__location_type']
+        # location = data['_Offer__location']
+        emp_data = data['_Offer__employer']
+        skill_data = data['_Offer__skills']
+        language_data = data['_Offer__languages']
+
+        employer = Employer.from_dict(emp_data)
+        skills = Skill.from_list(skill_data)
+
+        languages = []
+        for lang in language_data:
+            languages.append(Language.from_dict(lang))
+
+        return Offer(offer_id, title, state, desc, employer, loc_type, required_skills=skills, required_languages=languages)
     @property
     def id(self):
         return self.__id

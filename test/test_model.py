@@ -27,14 +27,14 @@ from test import performance_test, display_top
 
 
 OFFER_MODEL = ModelManager.get_offers_model()
-
+DEVELOPER_MODEL = ModelManager.get_developers_model()
 
 class ModelTest(unittest.TestCase):
     """
     Implementation of model.py tests
     """
 
-    def test_operations(self):
+    def test_operations_offer(self):
         def test_performance():
             recommendation = OFFER_MODEL.similar_items(stub_developer)
             print(f'Recommended Offers: \n{recommendation}')
@@ -58,6 +58,17 @@ class ModelTest(unittest.TestCase):
             OFFER_MODEL.remove_item(stub_offer)
             test_remove = OFFER_MODEL.get_item(1000)
             print(f'Test Remove: \n{test_remove}')
+
+        tracemalloc.start()
+        test_performance()
+        snapshot = tracemalloc.take_snapshot()
+        display_top(snapshot, limit=5)
+
+
+    def test_operations_developer(self):
+        def test_performance():
+            recommendation = DEVELOPER_MODEL.similar_items(stub_offer)
+            print(f'Recommended Developers: \n{recommendation}')
 
         tracemalloc.start()
         test_performance()
