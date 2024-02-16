@@ -35,4 +35,4 @@ pip install -r requirements.txt
 4. Esegui il seguente comando tramite un terminale bash specificando l'indirizzo su cui è stato 
 effettuato il deploy del del database come [ip:port/connection] (es. localhost:3306/turing_careers), poi il nume utente e la password:
 
-*Per l'installazione dell'intero sistema occorre seguire le istruzioni nella repository [Core](https://github.com/JacopoPassariello/TuringCareers)
+*Nota: Per l'installazione dell'intero sistema occorre seguire le istruzioni nella repository [Core](https://github.com/JacopoPassariello/TuringCareers)*
