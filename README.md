@@ -1,4 +1,15 @@
-# RecommenderSystem_TC
+# TC Recommender API
+
+### Introduzione
+Lo scopo del progetto TC Reccomender AI consiste nella realizzazione di un modulo di intelligenza arti-
+ficiale, il quale dovrà essere integrato nel sito web Turing Careers; il modulo permetterà agli utenti di 
+ottenere raccomandazioni adatte al tipo di utente, in particolare:
+- Raccomandazione di Offerte di Lavoro a Sviluppatori;
+- Raccomandazione di Profili di Sviluppatori a Datori di Lavoro;
+
+Per quanto riguarda la realizzazione del sistema è possibile visionare:
+- I Jupyter Notebook all'interno del package *notebooks*.
+- La documentazione contenuta nel package *docs*.
 
 ### Installazione
 **Dipendenze TC Recommender**:
@@ -23,3 +34,5 @@ pip install -r requirements.txt
 ```
 4. Esegui il seguente comando tramite un terminale bash specificando l'indirizzo su cui è stato 
 effettuato il deploy del del database come [ip:port/connection] (es. localhost:3306/turing_careers), poi il nume utente e la password:
+
+*Per l'installazione dell'intero sistema occorre seguire le istruzioni nella repository [Core](https://github.com/JacopoPassariello/TuringCareers)
