@@ -46,6 +46,8 @@ class SearchAPI:
         async def search_offers(request: Request):
             content = await request.json()
             developer = Developer.from_dict(content['developer'])
+            if content['query'] == 'RECOMMEND':
+                return RecommenderEngine.recommend_offer(developer)
             return RecommenderEngine.search_offer(content['query'], developer)
 
         @self.__app.post('/engine/v1/offers/recommend')
