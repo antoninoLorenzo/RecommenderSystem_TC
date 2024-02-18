@@ -59,7 +59,9 @@ class SearchAPI:
         @self.__app.post('/engine/v1/developers')
         async def recommend_developers(request: Request):
             content = await request.json()
+            print(content)
             offer = Offer.from_dict(content)
+
             output = RecommenderEngine.recommend_developer(offer)
             _output = []
             for o in output:

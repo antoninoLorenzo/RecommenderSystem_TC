@@ -49,6 +49,7 @@ class Skill:
     def type(self):
         return self.__type
 
+
 """
 NUKED
 class Location:
@@ -79,6 +80,7 @@ class Location:
     def __str__(self):
         return f'[{self.__id}]: {self.__name} ({self.__lat}, {self.__lon})'
 """
+
 
 class Language:
     def __init__(self, lid, language_code):
@@ -196,7 +198,6 @@ class Developer(Item):
         return self.__skills
 
 
-
 class Employer:
     def __init__(self, emp_id, f_name, l_name, mail, psw, company_name):
         self.__id: int = emp_id
@@ -229,8 +230,8 @@ class Offer(Item):
                  title: str,
                  state: str,
                  description: str,
-                 employer: Employer,
-                 location_type: str,
+                 employer: Employer = None,
+                 location_type: str = '',
                  location: str | None = None,
                  required_skills: list[Skill] | None = None,
                  required_languages: list[Language] | None = None):
@@ -251,19 +252,37 @@ class Offer(Item):
         desc = data['_Offer__description']
         state = data['_Offer__state']
         loc_type = data['_Offer__location_type']
-        # location = data['_Offer__location']
-        emp_data = data['_Offer__employer']
         skill_data = data['_Offer__skills']
-        language_data = data['_Offer__languages']
-
-        employer = Employer.from_dict(emp_data)
         skills = Skill.from_list(skill_data)
+        # location = data['_Offer__location']
+        try:
+            emp_data = data['_Offer__employer']
+            language_data = data['_Offer__languages']
+            employer = Employer.from_dict(emp_data)
+            languages = []
+            for lang in language_data:
+                languages.append(Language.from_dict(lang))
+        except Exception:
+            return Offer(
+                id=offer_id,
+                title=title,
+                state=state,
+                description=desc,
+                location_type=loc_type,
+                required_skills=skills,
+            )
 
-        languages = []
-        for lang in language_data:
-            languages.append(Language.from_dict(lang))
+        return Offer(
+            id=offer_id,
+            title=title,
+            state=state,
+            description=desc,
+            employer=employer,
+            location_type=loc_type,
+            required_skills=skills,
+            required_languages=languages
+        )
 
-        return Offer(offer_id, title, state, desc, employer, loc_type, required_skills=skills, required_languages=languages)
     @property
     def id(self):
         return self.__id
@@ -308,4 +327,3 @@ class Offer(Item):
                 f'RequiredSkills: \n{self.__skills}\n'
                 f'Languages: \n{self.__languages}\n'
                 f'Description:\n{self.__description}\n')
-
