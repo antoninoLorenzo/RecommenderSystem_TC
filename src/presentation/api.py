@@ -45,15 +45,16 @@ class SearchAPI:
         @self.__app.post('/engine/v1/offers/search')
         async def search_offers(request: Request):
             content = await request.json()
-            developer = Developer.from_dict(content['developer'])
-            if content['query'] == 'RECOMMEND':
+            print(content)
+            developer = Developer.from_dict(content[1])
+            if content[0] == 'RECOMMEND':
                 return RecommenderEngine.recommend_offer(developer)
-            return RecommenderEngine.search_offer(content['query'], developer)
+            return RecommenderEngine.search_offer(content[0], developer)
 
         @self.__app.post('/engine/v1/offers/recommend')
         async def recommend_offers(request: Request):
             content = await request.json()
-            developer = Developer.from_dict(content)
+            developer = Developer.from_dict(content[1])
             return RecommenderEngine.recommend_offer(developer)
 
         @self.__app.post('/engine/v1/developers')
